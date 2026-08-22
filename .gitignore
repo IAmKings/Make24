@@ -1,24 +1,56 @@
-# macOS
+# ===== 操作系统 =====
 .DS_Store
+Thumbs.db
 
-# 宿主工具（Reasonix）会话缓存与配置，不属于项目源码
+# ===== 宿主工具（Reasonix）会话缓存与配置，不属于项目源码 =====
 .reasonix/
 reasonix.toml
 
-# Kotlin / Gradle 构建产物
-build/
+# ===== Kotlin / Gradle 构建产物 =====
 .gradle/
+**/build/
+# 保留 KMP 各平台 build 下的生成源码目录（KSP/KAPT 等生成物）
+!src/**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 *.class
 *.jar
-!.gradle-wrapper.jar
+!gradle-wrapper.jar
+.gradletasknamecache
 
-# IDE
+# ===== Kotlin/Native =====
+.kotlin/
+*.kexe
+*.klib
+
+# ===== Android =====
+# 本地 SDK 路径等本机配置（含个人路径，不应入库）
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ===== iOS / macOS（Compose Multiplatform）=====
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.hprof
+
+# ===== JS / Web =====
+node_modules/
+
+# ===== IDE / 编辑器 =====
 .idea/
 *.iml
+*.ipr
+*.iws
+.fleet/
 .vscode/
 
-# Kotlin/Native
-.kotlin/
+# ===== 环境变量与密钥（不应入库）=====
+.env
+.env.*
+*.local
 
-# 日志
+# ===== 日志 =====
 *.log
