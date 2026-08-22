@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -145,7 +145,7 @@ fun GameScreen(
             // Undo
             ActionButton(
                 text = strings["undo"] ?: "Undo",
-                icon = Icons.Filled.Undo,
+                icon = Icons.AutoMirrored.Filled.Undo,
                 enabled = state.history.isNotEmpty(),
                 onClick = { viewModel.onUndo() },
                 modifier = Modifier.weight(1f)

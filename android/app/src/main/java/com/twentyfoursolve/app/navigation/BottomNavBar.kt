@@ -34,7 +34,7 @@ import com.twentyfoursolve.app.theme.PlusJakartaSans
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 
 /**
@@ -51,7 +51,7 @@ fun BottomNavBar(
     val tabs = listOf(
         NavTab("home", "play", Icons.Filled.PlayArrow),
         NavTab("practice", "practice", Icons.Filled.FitnessCenter),
-        NavTab("rules", "rules", Icons.Filled.MenuBook),
+        NavTab("rules", "rules", Icons.AutoMirrored.Filled.MenuBook),
         NavTab("stats", "stats", Icons.Filled.BarChart)
     )
 
