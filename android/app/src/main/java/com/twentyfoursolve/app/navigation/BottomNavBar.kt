@@ -1,0 +1,122 @@
+package com.twentyfoursolve.app.navigation
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.twentyfoursolve.app.theme.CornerRadius
+import com.twentyfoursolve.app.theme.LocalStringProvider
+import com.twentyfoursolve.app.theme.PlusJakartaSans
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.PlayArrow
+
+/**
+ * Bottom navigation bar matching the web demo's design.
+ * Glassmorphism styling with active tab pill highlight.
+ */
+@Composable
+fun BottomNavBar(
+    currentTab: String,
+    onTabSelected: (String) -> Unit
+) {
+    val strings = LocalStringProvider.current
+
+    val tabs = listOf(
+        NavTab("home", "play", Icons.Filled.PlayArrow),
+        NavTab("practice", "practice", Icons.Filled.FitnessCenter),
+        NavTab("rules", "rules", Icons.Filled.MenuBook),
+        NavTab("stats", "stats", Icons.Filled.BarChart)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(8.dp)
+            .clip(RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp))
+            .background(
+                MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.95f)
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            tabs.forEach { tab ->
+                val isSelected = currentTab == tab.route
+                val bgColor = if (isSelected) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.surface.copy(alpha = 0f)
+                val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(24.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { onTabSelected(tab.route) }
+                        )
+                        .then(
+                            if (isSelected) Modifier.background(
+                                bgColor,
+                                RoundedCornerShape(24.dp)
+                            ) else Modifier
+                        )
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = tab.icon,
+                        contentDescription = tab.label,
+                        tint = contentColor,
+                        modifier = Modifier.size(if (isSelected) 22.dp else 20.dp)
+                    )
+                    Text(
+                        text = strings[tab.labelKey] ?: tab.label,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontFamily = PlusJakartaSans,
+                            letterSpacing = 1.5.sp
+                        ),
+                        color = contentColor
+                    )
+                }
+            }
+        }
+    }
+}
+
+data class NavTab(
+    val route: String,
+    val labelKey: String,
+    val icon: ImageVector,
+    val label: String = labelKey.replaceFirstChar { it.uppercase() }
+)

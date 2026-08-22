@@ -6,6 +6,14 @@ Thumbs.db
 .reasonix/
 reasonix.toml
 
+# ===== AI 工具目录（Trellis / Claude / Codex / Cursor / Grok 等会话与配置）=====
+.agents/
+.claude/
+.codex/
+.cursor/
+.grok/
+.trellis/
+
 # ===== Kotlin / Gradle 构建产物 =====
 .gradle/
 **/build/
