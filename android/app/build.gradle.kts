@@ -28,6 +28,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // CI / 本地自动发布默认使用 debug 密钥签名，保证 APK 可直接安装；
+            // 正式发布请改为在 signingConfigs 中配置正式 keystore（或用 secrets 注入）。
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
