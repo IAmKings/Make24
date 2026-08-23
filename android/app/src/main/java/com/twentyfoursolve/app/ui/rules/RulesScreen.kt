@@ -28,15 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twentyfoursolve.app.theme.CornerRadius
 import com.twentyfoursolve.app.theme.LocalStringProvider
 import com.twentyfoursolve.app.theme.PlusJakartaSans
 import com.twentyfoursolve.app.theme.Spacing
+import com.twentyfoursolve.app.ui.components.OperatorSymbol
 
 @Composable
 fun RulesScreen(
@@ -276,17 +275,11 @@ private fun RuleCard(
                                 color = MaterialTheme.colorScheme.secondaryContainer
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = op.symbol,
-                                        style = MaterialTheme.typography.headlineSmall.copy(
-                                            fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center,
-                                            // 不要强制 lineHeight=fontSize：默认字形框 > 1em，强制过小会把字形顶出/下移；
-                                            // 用默认行高（>= 字形框）+ 去掉字体内边距，字形在行内自然居中
-                                            platformStyle = PlatformTextStyle(includeFontPadding = false)
-                                        ),
+                                    OperatorSymbol(
+                                        symbol = op.symbol,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        textAlign = TextAlign.Center
+                                        // 符号画布 28dp，几何中心与 48dp 圆形容器中心重合，视觉精确居中
+                                        modifier = Modifier.size(28.dp)
                                     )
                                 }
                             }

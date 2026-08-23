@@ -51,7 +51,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,6 +61,7 @@ import com.twentyfoursolve.app.theme.LocalStringProvider
 import com.twentyfoursolve.app.theme.PlusJakartaSans
 import com.twentyfoursolve.app.theme.Spacing
 import com.twentyfoursolve.app.ui.components.NumberCard
+import com.twentyfoursolve.app.ui.components.OperatorSymbol
 import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.core.model.Suit
@@ -419,16 +419,12 @@ private fun OperatorButton(
         else MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = operator.symbol,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Black,
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSecondaryContainer,
-                    // 不强制 lineHeight，使用默认行高使字形在行内自然居中
-                    platformStyle = PlatformTextStyle(includeFontPadding = false)
-                )
+            OperatorSymbol(
+                symbol = operator.symbol,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSecondaryContainer,
+                // 符号画布 38dp，几何中心与 64dp 按钮容器中心重合，视觉精确居中
+                modifier = Modifier.size(38.dp)
             )
         }
     }
