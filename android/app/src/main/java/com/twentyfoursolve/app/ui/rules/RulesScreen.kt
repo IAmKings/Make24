@@ -287,7 +287,6 @@ private fun RuleCard(
                                             platformStyle = PlatformTextStyle(includeFontPadding = false)
                                         ),
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        modifier = Modifier.fillMaxSize(),
                                         textAlign = TextAlign.Center
                                     )
                                 }

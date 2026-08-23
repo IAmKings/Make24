@@ -162,7 +162,7 @@ private val chineseStrings = mapOf(
     "targetSet" to "目标数值",
     "startPractice" to "开始练习",
     "selected" to "已选择",
-    "play" to "挑战",
+    "play" to "挑战模式",
     "timeTaken" to "用时",
     "scoreLabel" to "得分",
     "soundEnabled" to "音效",
