@@ -118,18 +118,54 @@ fun NumberCard(
                 )
             }
 
-            // Center value (large hero)
-            Text(
-                text = label,
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Black,
-                    fontSize = 56.sp,
-                    lineHeight = 64.sp,
-                    color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
-                ),
-                textAlign = TextAlign.Center
-            )
+            // Center value (large hero)：分数 label 用分子/分母上下结构显示，避免单行溢出
+            if (label.contains("/")) {
+                val parts = label.split("/")
+                val fracColor = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = parts.getOrElse(0) { "" },
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 34.sp,
+                            lineHeight = 38.sp,
+                            color = fracColor
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .width(48.dp)
+                            .height(3.dp)
+                            .background(fracColor)
+                    )
+                    Text(
+                        text = parts.getOrElse(1) { "" },
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 34.sp,
+                            lineHeight = 38.sp,
+                            color = fracColor
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontFamily = PlusJakartaSans,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 56.sp,
+                        lineHeight = 64.sp,
+                        color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
+                    ),
+                    textAlign = TextAlign.Center
+                )
+            }
 
             // Bottom-right corner (rotated)
             Column(
