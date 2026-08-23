@@ -27,8 +27,10 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -65,6 +67,8 @@ fun GameScreen(
     isPractice: Boolean,
     numberRange: String = "Mixed",
     onExit: () -> Unit,
+    /** HUD 返回按钮：请求退出（由宿主弹出确认对话框后再调用 onExit）。 */
+    onRequestExit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = hiltViewModel()
 ) {
@@ -89,7 +93,8 @@ fun GameScreen(
             score = state.score,
             isPractice = isPractice,
             timeRemainingLabel = strings["timeRemaining"] ?: "Time Remaining",
-            scoreLabel = strings["currentScore"] ?: "Score"
+            scoreLabel = strings["currentScore"] ?: "Score",
+            onBack = onRequestExit
         )
 
         // Target Preview
@@ -188,7 +193,8 @@ private fun GameHud(
     score: Int,
     isPractice: Boolean,
     timeRemainingLabel: String,
-    scoreLabel: String
+    scoreLabel: String,
+    onBack: () -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -200,10 +206,19 @@ private fun GameHud(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(horizontal = 16.dp, vertical = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Back button
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             // Time remaining
             Column {
                 Text(
