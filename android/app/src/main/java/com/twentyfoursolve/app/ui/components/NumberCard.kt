@@ -97,22 +97,14 @@ fun NumberCard(
                 .padding(12.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Top-left corner
+            // Top-left corner（仅花色，不显示数字）
             Column(
                 modifier = Modifier.align(Alignment.TopStart),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Black,
-                        color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
-                    )
-                )
-                Text(
                     text = suitIcon,
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     )
                 )
@@ -167,22 +159,14 @@ fun NumberCard(
                 )
             }
 
-            // Bottom-right corner (rotated)
+            // Bottom-right corner（仅花色，不显示数字）
             Column(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Black,
-                        color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
-                    )
-                )
-                Text(
                     text = suitIcon,
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     )
                 )
