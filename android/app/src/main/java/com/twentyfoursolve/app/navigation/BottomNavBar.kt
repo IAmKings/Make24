@@ -58,10 +58,10 @@ fun BottomNavBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            // 背景透明 + 去掉阴影：底部栏完全透出页面统一背景，消除非圆角区的灰色色带；
-            // 仅保留顶部大圆角裁剪，作为与内容区的视觉过渡。
-            .clip(RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp))
-            .padding(horizontal = 24.dp, vertical = 12.dp)
+            // 四角统一圆角 + 不透明浅色背景：圆角边界清晰可见，且两端不再有直角色带（无阴影）
+            .clip(RoundedCornerShape(32.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -90,7 +90,7 @@ fun BottomNavBar(
                                 RoundedCornerShape(24.dp)
                             ) else Modifier
                         )
-                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
                     Icon(
                         imageVector = tab.icon,
@@ -102,9 +102,11 @@ fun BottomNavBar(
                         text = strings[tab.labelKey] ?: tab.label,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontFamily = PlusJakartaSans,
-                            letterSpacing = 1.5.sp
+                            letterSpacing = 0.5.sp
                         ),
-                        color = contentColor
+                        color = contentColor,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
             }

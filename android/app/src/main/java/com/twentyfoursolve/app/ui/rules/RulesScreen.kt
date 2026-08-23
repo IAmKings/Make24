@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -281,7 +282,9 @@ private fun RuleCard(
                                             fontSize = 24.sp,
                                             lineHeight = 24.sp,
                                             fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center
+                                            textAlign = TextAlign.Center,
+                                            // 去掉字体上下内边距，让符号字形严格居中于圆形徽章
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false)
                                         ),
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.fillMaxSize(),

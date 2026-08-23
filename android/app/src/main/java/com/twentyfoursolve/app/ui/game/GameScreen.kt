@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -426,7 +427,9 @@ private fun OperatorButton(
                     fontSize = 28.sp,
                     lineHeight = 28.sp,
                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSecondaryContainer
+                    else MaterialTheme.colorScheme.onSecondaryContainer,
+                    // 去掉字体上下内边距，让符号字形严格居中
+                    platformStyle = PlatformTextStyle(includeFontPadding = false)
                 )
             )
         }
