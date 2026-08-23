@@ -279,11 +279,10 @@ private fun RuleCard(
                                     Text(
                                         text = op.symbol,
                                         style = MaterialTheme.typography.headlineSmall.copy(
-                                            fontSize = 24.sp,
-                                            lineHeight = 24.sp,
                                             fontWeight = FontWeight.Black,
                                             textAlign = TextAlign.Center,
-                                            // 去掉字体上下内边距，让符号字形严格居中于圆形徽章
+                                            // 不要强制 lineHeight=fontSize：默认字形框 > 1em，强制过小会把字形顶出/下移；
+                                            // 用默认行高（>= 字形框）+ 去掉字体内边距，字形在行内自然居中
                                             platformStyle = PlatformTextStyle(includeFontPadding = false)
                                         ),
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,

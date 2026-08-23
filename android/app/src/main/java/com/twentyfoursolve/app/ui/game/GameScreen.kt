@@ -424,11 +424,9 @@ private fun OperatorButton(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Black,
-                    fontSize = 28.sp,
-                    lineHeight = 28.sp,
                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.onSecondaryContainer,
-                    // 去掉字体上下内边距，让符号字形严格居中
+                    // 不强制 lineHeight，使用默认行高使字形在行内自然居中
                     platformStyle = PlatformTextStyle(includeFontPadding = false)
                 )
             )
