@@ -41,9 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.twentyfoursolve.app.theme.CornerRadius
+import com.twentyfoursolve.app.theme.LocalLanguage
 import com.twentyfoursolve.app.theme.LocalStringProvider
 import com.twentyfoursolve.app.theme.PlusJakartaSans
 import com.twentyfoursolve.app.theme.Spacing
+import com.twentyfoursolve.core.model.Language
 
 @Composable
 fun StatsScreen(
@@ -363,7 +365,13 @@ private fun ActivityChart(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Bottom
             ) {
-                val days = listOf("M", "T", "W", "T", "F", "S", "S")
+                // 星期标签：区分度优先——中文用 一~日（单字互不重复），英文用双字母标准缩写
+                val language = LocalLanguage.current
+                val days = if (language == Language.ZH) {
+                    listOf("一", "二", "三", "四", "五", "六", "日")
+                } else {
+                    listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
+                }
                 val displayValues = if (values.size == 7) values
                 else values.take(7) + List(7 - values.size.coerceAtMost(7)) {
                     StatsUiModel.DailyWin(0, 0)
