@@ -24,9 +24,8 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -62,10 +61,11 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
         // Hero Section
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
             // Glow effect behind "24"
             Box(
                 contentAlignment = Alignment.Center,
@@ -213,110 +213,17 @@ fun HomeScreen(
             )
         }
 
-        // Settings Row
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(CornerRadius.lg))
-                .clickable { onNavigate("settings") },
-            shape = RoundedCornerShape(CornerRadius.lg),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh
+        // 设置入口：首页右上角小图标（位于 Hero Box 右上角）
+        IconButton(
+            onClick = { onNavigate("settings") },
+            modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Surface(
-                        modifier = Modifier.size(48.dp),
-                        shape = RoundedCornerShape(CornerRadius.md),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                    Column {
-                        Text(
-                            text = strings["settings"] ?: "Settings",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        Text(
-                            text = strings["audioSettings"] ?: "Audio, Difficulty & Account",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                Icon(
-                    imageVector = Icons.Filled.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        // Quick Tip
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(CornerRadius.lg)),
-            shape = RoundedCornerShape(CornerRadius.lg),
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-            border = androidx.compose.foundation.BorderStroke(
-                2.dp,
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = strings["settings"] ?: "Settings",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        ) {
-            Row(
-                modifier = Modifier.padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Surface(
-                    modifier = Modifier.size(36.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.Lightbulb,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-                Column {
-                    Text(
-                        text = strings["quickTip"] ?: "Quick Tip",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Black
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = strings["tipContent"]
-                            ?: "Combine numbers to make 24 using +, -, ×, and ÷. Every card must be used exactly once!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+        }
         }
     }
 }
