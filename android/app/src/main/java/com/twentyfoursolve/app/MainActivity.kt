@@ -134,7 +134,6 @@ fun Solve24NavHost() {
 
             composable(Routes.PRACTICE_CONFIG) {
                 PracticeScreen(
-                    onBack = { navController.popBackStack() },
                     onStartPractice = { diff, range ->
                         navController.navigate(Routes.gamePractice(diff, Uri.encode(range)))
                     }

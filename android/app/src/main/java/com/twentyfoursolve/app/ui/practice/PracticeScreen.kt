@@ -13,14 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,7 +46,6 @@ import com.twentyfoursolve.core.model.NumberRange
 
 @Composable
 fun PracticeScreen(
-    onBack: () -> Unit,
     onStartPractice: (difficulty: String, range: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -54,32 +53,29 @@ fun PracticeScreen(
     var selectedDifficulty by remember { mutableStateOf("easy") }
     var selectedRange by remember { mutableStateOf("Mixed") }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = Spacing.lg, vertical = Spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            .padding(horizontal = Spacing.lg, vertical = Spacing.lg)
     ) {
-        // Back button
-        IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = strings["backToHome"],
-                tint = MaterialTheme.colorScheme.primary
+        // 配置内容可滚动（避免小屏下底部被截断）；开始按钮固定在底部
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        ) {
+            // Title
+            Text(
+                text = strings["practice"] ?: "Practice",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Black,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    letterSpacing = (-1).sp
+                ),
+                color = MaterialTheme.colorScheme.onSurface
             )
-        }
-
-        // Title
-        Text(
-            text = strings["practice"] ?: "Practice",
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Black,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                letterSpacing = (-1).sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
         Text(
             text = strings["practiceDesc"] ?: "Hone your math skills at your own pace.",
             style = MaterialTheme.typography.bodyLarge,
@@ -175,9 +171,14 @@ fun PracticeScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Start Practice Button (gradient)
+        // 为底部固定开始按钮预留空间
+        Spacer(modifier = Modifier.height(88.dp))
+        }
+
+        // Start Practice Button（固定在底部，始终可见）
         Surface(
             modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(72.dp)
                 .clip(RoundedCornerShape(CornerRadius.full))
