@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432" fill="none">
+  <title>Arithmetickle 24 Point adaptive app icon</title>
+  <desc>Electric blue math game icon with overlapping solar orange number cards and a bold 24.</desc>
+  <rect width="432" height="432" fill="#0058BB"/>
+  <circle cx="340" cy="72" r="156" fill="#6C9FFF" opacity=".34"/>
+  <circle cx="86" cy="378" r="142" fill="#003F8A" opacity=".28"/>
+  <path d="M-24 318C68 250 113 286 181 329C249 372 302 410 456 318V456H-24V318Z" fill="#004A9F" opacity=".42"/>
+  <g fill="#FECB00"><path d="M72 82l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2 6-13Z"/><path d="M362 344l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2 5-10Z"/></g>
+  <g transform="translate(86 112) rotate(-14 72 87)"><rect width="144" height="174" rx="30" fill="#FFC794"/><text x="72" y="126" text-anchor="middle" fill="#884D00" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-size="100" font-weight="900">2</text><circle cx="34" cy="35" r="9" fill="#884D00" opacity=".45"/></g>
+  <g transform="translate(226 91) rotate(12 72 87)"><rect width="144" height="174" rx="30" fill="#FEC470"/><text x="72" y="126" text-anchor="middle" fill="#884D00" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-size="100" font-weight="900">4</text><circle cx="110" cy="35" r="9" fill="#884D00" opacity=".45"/></g>
+  <g transform="translate(87 246) rotate(12 72 87)"><rect width="144" height="174" rx="30" fill="#FFD9AE"/><text x="72" y="126" text-anchor="middle" fill="#884D00" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-size="100" font-weight="900">6</text><circle cx="34" cy="139" r="9" fill="#884D00" opacity=".35"/></g>
+  <g transform="translate(222 242) rotate(-13 72 87)"><rect width="144" height="174" rx="30" fill="#FFB85C"/><text x="72" y="126" text-anchor="middle" fill="#884D00" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-size="100" font-weight="900">8</text><circle cx="110" cy="139" r="9" fill="#884D00" opacity=".42"/></g>
+  <circle cx="216" cy="216" r="73" fill="#FECB00"/><circle cx="216" cy="216" r="61" fill="#0058BB" opacity=".96"/>
+  <text x="216" y="239" text-anchor="middle" fill="#FFFFFF" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-size="68" font-weight="900" letter-spacing="-5">24</text>
+  <path d="M190 169h52" stroke="#6C9FFF" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+</svg>
