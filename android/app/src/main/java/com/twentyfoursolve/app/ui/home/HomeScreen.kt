@@ -192,7 +192,20 @@ fun HomeScreen(
             }
         }
 
-        // Bento Grid Navigation
+        // 设置入口：首页右上角小图标（位于 Hero Box 右上角）
+        IconButton(
+            onClick = { onNavigate("settings") },
+            modifier = Modifier.align(Alignment.TopEnd)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = strings["settings"] ?: "Settings",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        }
+
+        // Bento Grid Navigation（根 Column 子项，Hero 下方原位）
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -211,19 +224,6 @@ fun HomeScreen(
                 onClick = { onNavigate("stats") },
                 modifier = Modifier.weight(1f)
             )
-        }
-
-        // 设置入口：首页右上角小图标（位于 Hero Box 右上角）
-        IconButton(
-            onClick = { onNavigate("settings") },
-            modifier = Modifier.align(Alignment.TopEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Settings,
-                contentDescription = strings["settings"] ?: "Settings",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
         }
     }
 }
