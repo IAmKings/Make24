@@ -48,11 +48,12 @@ fun BottomNavBar(
 ) {
     val strings = LocalStringProvider.current
 
+    // tab 路由直接使用 NavHost 中的实际路由；"practice" tab 对应练习配置页 practice_config
     val tabs = listOf(
-        NavTab("home", "play", Icons.Filled.PlayArrow),
-        NavTab("practice", "practice", Icons.Filled.FitnessCenter),
-        NavTab("rules", "rules", Icons.AutoMirrored.Filled.MenuBook),
-        NavTab("stats", "stats", Icons.Filled.BarChart)
+        NavTab(Routes.HOME, "play", Icons.Filled.PlayArrow),
+        NavTab(Routes.PRACTICE_CONFIG, "practice", Icons.Filled.FitnessCenter),
+        NavTab(Routes.RULES, "rules", Icons.AutoMirrored.Filled.MenuBook),
+        NavTab(Routes.STATS, "stats", Icons.Filled.BarChart)
     )
 
     Box(

@@ -1,5 +1,6 @@
 package com.twentyfoursolve.app.ui.game
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -29,16 +30,21 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,13 +73,15 @@ fun GameScreen(
     isPractice: Boolean,
     numberRange: String = "Mixed",
     onExit: () -> Unit,
-    /** HUD 返回按钮：请求退出（由宿主弹出确认对话框后再调用 onExit）。 */
-    onRequestExit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val strings = LocalStringProvider.current
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    // 系统返回键：游戏进行中先弹确认，防止误触丢失进度（确认后由 onExit 退出）
+    BackHandler { showExitDialog = true }
 
     // Initialize the game when composable enters
     LaunchedEffect(difficulty, isPractice, numberRange) {
@@ -94,7 +102,7 @@ fun GameScreen(
             isPractice = isPractice,
             timeRemainingLabel = strings["timeRemaining"] ?: "Time Remaining",
             scoreLabel = strings["currentScore"] ?: "Score",
-            onBack = onRequestExit
+            onBack = { showExitDialog = true }
         )
 
         // Target Preview
@@ -183,6 +191,28 @@ fun GameScreen(
             onExit = onExit,
             strings = strings,
             isPractice = isPractice
+        )
+    }
+
+    // 退出确认（HUD 返回按钮 / 系统返回键触发）
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(strings["exitConfirmTitle"] ?: "Exit Game") },
+            text = { Text(strings["exitConfirmText"] ?: "Are you sure you want to exit? Current progress will be lost.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    onExit()
+                }) {
+                    Text(strings["exitConfirm"] ?: "Exit")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(strings["cancel"] ?: "Cancel")
+                }
+            }
         )
     }
 }
