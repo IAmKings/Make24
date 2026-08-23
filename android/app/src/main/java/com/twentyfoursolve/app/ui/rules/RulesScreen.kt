@@ -91,7 +91,12 @@ fun RulesScreen(
             title = strings["rule3Title"] ?: "3. The Operators",
             description = strings["rule3Desc"]
                 ?: "Use basic arithmetic: Addition, Subtraction, Multiplication, and Division.",
-            operators = listOf("+", "−", "×", "÷")
+            operators = listOf(
+                OperatorInfo("+", strings["opAdd"] ?: "Addition", strings["opAddDesc"] ?: "Combine two numbers"),
+                OperatorInfo("−", strings["opSub"] ?: "Subtraction", strings["opSubDesc"] ?: "Take the difference"),
+                OperatorInfo("×", strings["opMul"] ?: "Multiplication", strings["opMulDesc"] ?: "Multiply two numbers"),
+                OperatorInfo("÷", strings["opDiv"] ?: "Division", strings["opDivDesc"] ?: "Split into equal parts")
+            )
         )
 
         // Example
@@ -175,6 +180,13 @@ fun RulesScreen(
     }
 }
 
+/** 运算符条目：符号 + 运算名称 + 简短说明。 */
+data class OperatorInfo(
+    val symbol: String,
+    val name: String,
+    val description: String
+)
+
 @Composable
 private fun RuleCard(
     icon: String,
@@ -182,7 +194,7 @@ private fun RuleCard(
     description: String,
     numberBadges: List<String> = emptyList(),
     highlight: String? = null,
-    operators: List<String> = emptyList()
+    operators: List<OperatorInfo> = emptyList()
 ) {
     Surface(
         modifier = Modifier
@@ -270,23 +282,44 @@ private fun RuleCard(
             }
 
             if (operators.isNotEmpty()) {
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     operators.forEach { op ->
-                        Surface(
-                            modifier = Modifier.size(48.dp),
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.secondaryContainer
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
+                            Surface(
+                                modifier = Modifier.size(48.dp),
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.secondaryContainer
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = op.symbol,
+                                        style = MaterialTheme.typography.headlineSmall.copy(
+                                            fontWeight = FontWeight.Black
+                                        ),
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                }
+                            }
+                            Column {
                                 Text(
-                                    text = op,
-                                    style = MaterialTheme.typography.headlineSmall.copy(
-                                        fontWeight = FontWeight.Black
+                                    text = op.name,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontFamily = PlusJakartaSans,
+                                        fontWeight = FontWeight.Bold
                                     ),
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = op.description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
