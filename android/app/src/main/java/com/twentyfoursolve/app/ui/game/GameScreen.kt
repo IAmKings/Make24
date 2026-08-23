@@ -261,6 +261,25 @@ fun GameScreen(
         )
     }
 
+    // 简单难度合并被拒绝提示（此步后无解）
+    if (state.mergeRejected) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearMergeRejected() },
+            title = { Text(strings["unsolvable"] ?: "No Solution") },
+            text = {
+                Text(
+                    strings["mergeRejected"]
+                        ?: "No solution after this step — please try another combination."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearMergeRejected() }) {
+                    Text(strings["gotIt"] ?: "Got It")
+                }
+            }
+        )
+    }
+
     // 退出确认（HUD 返回按钮 / 系统返回键触发）
     if (showExitDialog) {
         AlertDialog(

@@ -212,6 +212,27 @@ class GameViewModel @Inject constructor(
         val result = rn.toDouble() / rd.toDouble()
         if (result.isNaN() || result.isInfinite()) return
 
+        // 简单难度：合并后剩余 3 张牌必须仍可解，否则拒绝该步（低难度不出现无解死局）
+        if (current.difficulty == Difficulty.EASY) {
+            val others = current.cards.filterIndexed { idx, c ->
+                idx != firstIdx && idx != secondIdx && !c.isUsed
+            }
+            val solvable = if (others.size == 2) {
+                TwentyFourSolver.solveThree(
+                    Rational(others[0].numerator, others[0].denominator),
+                    Rational(others[1].numerator, others[1].denominator),
+                    Rational(rn, rd),
+                    SolveOptions(style = ExpressionStyle.FULLY_PARENTHESIZED)
+                ).status == SolveStatus.SOLVED
+            } else {
+                true
+            }
+            if (!solvable) {
+                _state.value = current.copy(mergeRejected = true)
+                return
+            }
+        }
+
         // Save history for undo
         val newHistory: List<List<Card>> = current.history + listOf(current.cards.map { it.copy() })
 
@@ -316,6 +337,10 @@ class GameViewModel @Inject constructor(
 
     fun clearSolvable() {
         _state.value = _state.value.copy(solvable = null)
+    }
+
+    fun clearMergeRejected() {
+        _state.value = _state.value.copy(mergeRejected = false)
     }
 
     private fun gcd(a0: Long, b0: Long): Long {

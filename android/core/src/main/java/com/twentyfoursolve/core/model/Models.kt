@@ -92,7 +92,9 @@ data class GameState(
     /** 提示：当前牌面的一个解法表达式（null 表示未请求提示）。 */
     val hint: String? = null,
     /** 可解性检查结果：null=未检查，true=有解，false=无解。 */
-    val solvable: Boolean? = null
+    val solvable: Boolean? = null,
+    /** 简单难度下合并被拒绝（合并后剩余牌面无解）。 */
+    val mergeRejected: Boolean = false
 )
 
 /**
