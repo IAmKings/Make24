@@ -294,17 +294,54 @@ class GameViewModel @Inject constructor(
     }
 
     fun onReset() {
-        startNewGame(_state.value.difficulty, currentIsPractice)
+        abandonToNewRound()
     }
 
     fun onNextRound() {
-        startNewGame(_state.value.difficulty, currentIsPractice)
+        abandonToNewRound()
     }
 
-    /** 请求提示：按当前剩余牌数分派求解器（4 张 → solve，3 张 → solveThree，2 张 → solveTwo）。 */
+    /**
+     * 重置/换题：普通模式下放弃未结束的当前局（保存失败记录以打断连胜），再进入下一局。
+     * 提示与无解确认均为纯参考，不在此打断连胜。
+     */
+    private fun abandonToNewRound() {
+        val current = _state.value
+        if (!currentIsPractice && !current.isGameOver) {
+            viewModelScope.launch {
+                gameRepository.saveGameRecord(
+                    GameRecord(
+                        isSuccess = false,
+                        score = current.score,
+                        timeTaken = totalGameTime - current.timeRemaining,
+                        difficulty = current.difficulty.name.lowercase(),
+                        mode = "timed"
+                    )
+                )
+            }
+        }
+        startNewGame(current.difficulty, currentIsPractice)
+    }
+
+    /** 请求提示：按当前剩余牌数分派求解器；有解给解法，无解给"当前无解"回答，纯参考展示。 */
     fun requestHint() {
-        val hint = solveCurrentBoard(ExpressionStyle.COMPACT)?.expression
-        _state.value = _state.value.copy(hint = hint)
+        val result = solveCurrentBoard(ExpressionStyle.COMPACT)
+        when (result?.status) {
+            SolveStatus.SOLVED -> {
+                _state.value = _state.value.copy(
+                    hint = result.expression,
+                    hintUnsolvable = false
+                )
+            }
+            SolveStatus.UNSOLVABLE -> {
+                // 当前牌面无解也是提示的一种回答（不打断连胜、不重置）
+                _state.value = _state.value.copy(hint = null, hintUnsolvable = true)
+            }
+            else -> {
+                // 剩余 1 张等无提示场景
+                _state.value = _state.value.copy(hint = null, hintUnsolvable = false)
+            }
+        }
     }
 
     /** 无解按钮：检查当前剩余牌面是否有解（生成器保证初始有解，合并后可能走错）。 */
@@ -336,7 +373,7 @@ class GameViewModel @Inject constructor(
     }
 
     fun clearHint() {
-        _state.value = _state.value.copy(hint = null)
+        _state.value = _state.value.copy(hint = null, hintUnsolvable = false)
     }
 
     fun clearSolvable() {

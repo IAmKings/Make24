@@ -237,6 +237,22 @@ fun GameScreen(
         )
     }
 
+    // 提示结果为"当前无解"（作为回答展示，纯参考，不提供操作）
+    if (state.hintUnsolvable) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearHint() },
+            title = { Text(strings["unsolvable"] ?: "No Solution") },
+            text = {
+                Text(strings["hintUnsolvable"] ?: "No solution for the current hand — try undoing a step or starting over.")
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearHint() }) {
+                    Text(strings["gotIt"] ?: "Got It")
+                }
+            }
+        )
+    }
+
     // 无解检查弹窗（有解 / 确实无解）
     state.solvable?.let { solvable ->
         AlertDialog(

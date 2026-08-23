@@ -96,7 +96,9 @@ data class GameState(
     /** 简单难度下合并被拒绝（合并后剩余牌面无解）。 */
     val mergeRejected: Boolean = false,
     /** 是否允许无解题（设置配置；决定无解按钮可用性）。 */
-    val allowUnsolvable: Boolean = true
+    val allowUnsolvable: Boolean = true,
+    /** 提示结果为无解（当前牌面无法到 24，作为回答展示）。 */
+    val hintUnsolvable: Boolean = false
 )
 
 /**
