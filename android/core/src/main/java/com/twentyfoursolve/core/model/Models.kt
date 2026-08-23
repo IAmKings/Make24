@@ -85,7 +85,11 @@ data class GameState(
     val difficulty: Difficulty = Difficulty.MEDIUM,
     val isGameOver: Boolean = false,
     val isSuccess: Boolean = false,
-    val history: List<List<Card>> = emptyList()
+    val history: List<List<Card>> = emptyList(),
+    /** 提示：当前牌面的一个解法表达式（null 表示未请求提示）。 */
+    val hint: String? = null,
+    /** 可解性检查结果：null=未检查，true=有解，false=无解。 */
+    val solvable: Boolean? = null
 )
 
 /**

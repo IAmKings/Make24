@@ -8,6 +8,10 @@ import com.twentyfoursolve.core.logic.createCards
 import com.twentyfoursolve.core.logic.evaluateEquation
 import com.twentyfoursolve.core.logic.generatePuzzle
 import com.twentyfoursolve.core.logic.isTwentyFour
+import com.make24.solver.ExpressionStyle
+import com.make24.solver.SolveOptions
+import com.make24.solver.SolveStatus
+import com.make24.solver.TwentyFourSolver
 import com.twentyfoursolve.core.model.Card
 import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.GameRecord
@@ -240,6 +244,33 @@ class GameViewModel @Inject constructor(
     fun onNextRound() {
         startNewGame(_state.value.difficulty, currentIsPractice)
     }
+
+    /** 请求提示：用求解器算出当前牌面的一个解法表达式（紧凑格式）。 */
+    fun requestHint() {
+        val nums = currentCardValues()
+        val result = TwentyFourSolver.solve(nums, SolveOptions(style = ExpressionStyle.COMPACT))
+        _state.value = _state.value.copy(
+            hint = if (result.status == SolveStatus.SOLVED) result.expression else null
+        )
+    }
+
+    /** 无解按钮：检查当前牌面是否有解（生成器保证有解，此按钮用于给玩家反馈/确认）。 */
+    fun checkUnsolvable() {
+        val nums = currentCardValues()
+        val result = TwentyFourSolver.solve(nums)
+        _state.value = _state.value.copy(solvable = result.status == SolveStatus.SOLVED)
+    }
+
+    fun clearHint() {
+        _state.value = _state.value.copy(hint = null)
+    }
+
+    fun clearSolvable() {
+        _state.value = _state.value.copy(solvable = null)
+    }
+
+    private fun currentCardValues(): IntArray =
+        _state.value.cards.map { it.value.toInt() }.toIntArray()
 
     private fun saveGameRecord() {
         val current = _state.value

@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
@@ -150,6 +152,27 @@ fun GameScreen(
             }
         }
 
+        // Hint & No-Solution
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ActionButton(
+                text = strings["unsolvable"] ?: "No Solution",
+                icon = Icons.Filled.HelpOutline,
+                enabled = !state.isGameOver,
+                onClick = { viewModel.checkUnsolvable() },
+                modifier = Modifier.weight(1f)
+            )
+            ActionButton(
+                text = strings["hint"] ?: "Hint",
+                icon = Icons.Filled.Lightbulb,
+                enabled = !state.isGameOver,
+                onClick = { viewModel.requestHint() },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
         // Action Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -191,6 +214,50 @@ fun GameScreen(
             onExit = onExit,
             strings = strings,
             isPractice = isPractice
+        )
+    }
+
+    // 提示弹窗（显示求解器给出的解法表达式）
+    state.hint?.let { hint ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearHint() },
+            title = { Text(strings["hint"] ?: "Hint") },
+            text = {
+                Text(
+                    (strings["hintText"] ?: "Solution: %s").format(hint),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearHint() }) {
+                    Text(strings["gotIt"] ?: "Got It")
+                }
+            }
+        )
+    }
+
+    // 无解检查弹窗（有解 / 确实无解）
+    state.solvable?.let { solvable ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearSolvable() },
+            title = { Text(strings["unsolvable"] ?: "No Solution") },
+            text = {
+                Text(
+                    if (solvable) {
+                        strings["unsolvableHasSolution"] ?: "This hand is solvable — keep trying!"
+                    } else {
+                        strings["unsolvableNone"] ?: "This hand has no solution."
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.clearSolvable()
+                    if (!solvable) viewModel.onNextRound()
+                }) {
+                    Text(strings["gotIt"] ?: "Got It")
+                }
+            }
         )
     }
 
