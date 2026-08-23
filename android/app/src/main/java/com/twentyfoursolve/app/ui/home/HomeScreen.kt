@@ -1,5 +1,6 @@
 package com.twentyfoursolve.app.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +42,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twentyfoursolve.app.R
 import com.twentyfoursolve.app.theme.CornerRadius
 import com.twentyfoursolve.app.theme.LocalStringProvider
 import com.twentyfoursolve.app.theme.PlusJakartaSans
@@ -70,34 +73,15 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-            // Glow effect behind "24"
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                // Ambient glow
-                Box(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape)
-                        .background(
-                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
-                        )
-                )
-                // "24" hero text
-                Text(
-                    text = "24",
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 128.sp,
-                        lineHeight = 128.sp,
-                        letterSpacing = (-4).sp,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    ),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            // 应用图标（24point-adaptive-icon）作为首页顶部视觉，圆形展示
+            Image(
+                painter = painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(176.dp)
+                    .clip(CircleShape)
+                    .padding(bottom = 16.dp)
+            )
 
             // Tagline
             Text(
