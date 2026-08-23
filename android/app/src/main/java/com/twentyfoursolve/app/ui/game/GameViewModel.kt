@@ -74,6 +74,7 @@ class GameViewModel @Inject constructor(
             difficulty = difficulty,
             timeRemaining = if (isPractice) Int.MAX_VALUE else 120,
             allowUnsolvable = allowUnsolvable,
+            initialPuzzle = puzzle,
             isGameOver = false,
             isSuccess = false,
             history = emptyList(),
@@ -344,9 +345,14 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    /** 无解按钮：检查当前剩余牌面是否有解（生成器保证初始有解，合并后可能走错）。 */
+    /**
+     * 无解按钮：仅回答开局发牌是否无解（在允许无解牌局的模式下）。
+     * 不参与用户操作后的局面判断——操作后的无解由提示按钮承担。
+     */
     fun checkUnsolvable() {
-        val solved = solveCurrentBoard(ExpressionStyle.FULLY_PARENTHESIZED)?.status == SolveStatus.SOLVED
+        val initial = _state.value.initialPuzzle
+        val solved = initial.isNotEmpty() &&
+            TwentyFourSolver.solve(initial.toIntArray()).status == SolveStatus.SOLVED
         _state.value = _state.value.copy(solvable = solved)
     }
 

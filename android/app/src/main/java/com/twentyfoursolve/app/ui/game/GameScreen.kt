@@ -160,8 +160,11 @@ fun GameScreen(
             ActionButton(
                 text = strings["unsolvable"] ?: "No Solution",
                 icon = Icons.Filled.HelpOutline,
-                // 仅当配置允许无解且非简单难度时可点（简单难度始终有解）
-                enabled = state.allowUnsolvable && state.difficulty != Difficulty.EASY && !state.isGameOver,
+                // 仅回答开局发牌是否无解：配置允许 + 非简单难度 + 尚未操作（未合并过）
+                enabled = state.allowUnsolvable &&
+                    state.difficulty != Difficulty.EASY &&
+                    state.history.isEmpty() &&
+                    !state.isGameOver,
                 onClick = { viewModel.checkUnsolvable() },
                 modifier = Modifier.weight(1f)
             )
