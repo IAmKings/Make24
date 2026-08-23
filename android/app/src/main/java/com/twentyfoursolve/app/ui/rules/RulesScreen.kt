@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -44,36 +46,42 @@ fun RulesScreen(
 ) {
     val strings = LocalStringProvider.current
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = Spacing.lg, vertical = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+            .padding(horizontal = Spacing.lg, vertical = Spacing.xl)
     ) {
-        // Header
-        Text(
-            text = strings["howToPlay"] ?: "How to Play",
-            style = MaterialTheme.typography.headlineLarge.copy(
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Black,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                letterSpacing = (-1).sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = strings["masterNumbers"] ?: "Master the numbers and hit the magic 24.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        // 玩法介绍内容可滚动（内容超一屏时下滑查看，避免被屏幕截断丢失）
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+        ) {
+            // Header
+            Text(
+                text = strings["howToPlay"] ?: "How to Play",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Black,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    letterSpacing = (-1).sp
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = strings["masterNumbers"] ?: "Master the numbers and hit the magic 24.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-        // Rule 1
-        RuleCard(
-            icon = "🔢",
-            title = strings["rule1Title"] ?: "1. Use Four Numbers",
-            description = strings["rule1Desc"]
-                ?: "Each round gives you four random numbers. You must use every number exactly once.",
-            numberBadges = listOf("6", "4", "3", "2")
+            // Rule 1
+            RuleCard(
+                icon = "🔢",
+                title = strings["rule1Title"] ?: "1. Use Four Numbers",
+                description = strings["rule1Desc"]
+                    ?: "Each round gives you four random numbers. You must use every number exactly once.",
+                numberBadges = listOf("6", "4", "3", "2")
         )
 
         // Rule 2
@@ -146,11 +154,14 @@ fun RulesScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // 为底部固定返回按钮预留空间
+        Spacer(modifier = Modifier.height(72.dp))
+        }
 
-        // Back to Home
+        // Back to Home（固定在底部，不随内容滚动）
         Surface(
             modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(56.dp)
                 .clip(RoundedCornerShape(CornerRadius.full))
