@@ -7,13 +7,11 @@ import com.twentyfoursolve.app.audio.SoundType
 import com.twentyfoursolve.core.logic.createCards
 import com.twentyfoursolve.core.logic.evaluateEquation
 import com.twentyfoursolve.core.logic.generatePuzzle
-import com.twentyfoursolve.core.logic.generatePuzzleForRange
 import com.twentyfoursolve.core.logic.isTwentyFour
 import com.twentyfoursolve.core.model.Card
 import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.GameRecord
 import com.twentyfoursolve.core.model.GameState
-import com.twentyfoursolve.core.model.NumberRange
 import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.data.repository.GameRepository
 import com.twentyfoursolve.data.repository.SettingsRepository
@@ -43,7 +41,6 @@ class GameViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var totalGameTime = 120 // seconds
     private var currentIsPractice = false
-    private var currentNumberRange = "Mixed"
 
     init {
         viewModelScope.launch {
@@ -53,17 +50,12 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun startNewGame(difficulty: Difficulty, isPractice: Boolean, numberRange: String) {
+    fun startNewGame(difficulty: Difficulty, isPractice: Boolean) {
         currentIsPractice = isPractice
-        currentNumberRange = numberRange
         timerJob?.cancel()
 
-        val puzzle = if (isPractice) {
-            val range = NumberRange.fromLabel(numberRange)
-            generatePuzzleForRange(range)
-        } else {
-            generatePuzzle(difficulty)
-        }
+        // 统一难度阶梯：普通局与练习局都由难度决定数字范围
+        val puzzle = generatePuzzle(difficulty)
 
         val cards = createCards(puzzle)
         totalGameTime = if (isPractice) Int.MAX_VALUE else 120
@@ -242,11 +234,11 @@ class GameViewModel @Inject constructor(
     }
 
     fun onReset() {
-        startNewGame(_state.value.difficulty, currentIsPractice, currentNumberRange)
+        startNewGame(_state.value.difficulty, currentIsPractice)
     }
 
     fun onNextRound() {
-        startNewGame(_state.value.difficulty, currentIsPractice, currentNumberRange)
+        startNewGame(_state.value.difficulty, currentIsPractice)
     }
 
     private fun saveGameRecord() {

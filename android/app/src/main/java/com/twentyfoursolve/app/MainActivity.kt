@@ -1,6 +1,5 @@
 package com.twentyfoursolve.app
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -118,24 +117,21 @@ fun Solve24NavHost() {
             composable(
                 route = Routes.GAME_PRACTICE,
                 arguments = listOf(
-                    navArgument("difficulty") { type = NavType.StringType; defaultValue = "easy" },
-                    navArgument("range") { type = NavType.StringType; defaultValue = "Mixed" }
+                    navArgument("difficulty") { type = NavType.StringType; defaultValue = "easy" }
                 )
             ) { entry ->
                 val difficulty = entry.arguments?.getString("difficulty") ?: "easy"
-                val range = Uri.decode(entry.arguments?.getString("range") ?: "Mixed")
                 GameScreen(
                     difficulty = difficulty,
                     isPractice = true,
-                    numberRange = range,
                     onExit = { navController.popBackStack() }
                 )
             }
 
             composable(Routes.PRACTICE_CONFIG) {
                 PracticeScreen(
-                    onStartPractice = { diff, range ->
-                        navController.navigate(Routes.gamePractice(diff, Uri.encode(range)))
+                    onStartPractice = { diff ->
+                        navController.navigate(Routes.gamePractice(diff))
                     }
                 )
             }

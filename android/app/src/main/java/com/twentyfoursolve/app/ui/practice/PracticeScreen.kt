@@ -42,16 +42,14 @@ import com.twentyfoursolve.app.theme.CornerRadius
 import com.twentyfoursolve.app.theme.LocalStringProvider
 import com.twentyfoursolve.app.theme.PlusJakartaSans
 import com.twentyfoursolve.app.theme.Spacing
-import com.twentyfoursolve.core.model.NumberRange
 
 @Composable
 fun PracticeScreen(
-    onStartPractice: (difficulty: String, range: String) -> Unit,
+    onStartPractice: (difficulty: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val strings = LocalStringProvider.current
     var selectedDifficulty by remember { mutableStateOf("easy") }
-    var selectedRange by remember { mutableStateOf("Mixed") }
 
     Box(
         modifier = modifier
@@ -115,62 +113,6 @@ fun PracticeScreen(
             onClick = { selectedDifficulty = "hard" }
         )
 
-        // Number Range Selection
-        Text(
-            text = strings["targetSet"]?.uppercase() ?: "TARGET SET",
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            NumberRange.entries.forEach { range ->
-                val isSelected = selectedRange == range.label
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(CornerRadius.lg))
-                        .clickable { selectedRange = range.label },
-                    shape = RoundedCornerShape(CornerRadius.lg),
-                    color = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceContainerLow
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = range.label,
-                                style = MaterialTheme.typography.headlineSmall.copy(
-                                    fontFamily = PlusJakartaSans,
-                                    fontWeight = FontWeight.Black,
-                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurface
-                                )
-                            )
-                            if (isSelected) {
-                                Text(
-                                    text = strings["selected"] ?: "Selected",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 1.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         // 为底部固定开始按钮预留空间
         Spacer(modifier = Modifier.height(88.dp))
         }
@@ -182,7 +124,7 @@ fun PracticeScreen(
                 .fillMaxWidth()
                 .height(72.dp)
                 .clip(RoundedCornerShape(CornerRadius.full))
-                .clickable { onStartPractice(selectedDifficulty, selectedRange) },
+                .clickable { onStartPractice(selectedDifficulty) },
             shape = RoundedCornerShape(CornerRadius.full),
             color = MaterialTheme.colorScheme.primary
         ) {

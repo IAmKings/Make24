@@ -44,11 +44,13 @@ enum class Operator(val symbol: String) {
 
 /**
  * Game difficulty levels.
+ * 统一难度阶梯：三档按数字范围递增（简单/中等/困难），难度即数值范围，
+ * 不再单独提供"目标数值集合"维度，避免两个选择语义重复。
  */
 enum class Difficulty(val range: IntRange, val label: String) {
-    EASY(1..10, "Easy"),
-    MEDIUM(1..13, "Medium"),
-    HARD(1..20, "Hard");
+    EASY(1..6, "Easy"),
+    MEDIUM(1..10, "Medium"),
+    HARD(1..13, "Hard");
 
     companion object {
         fun fromName(name: String): Difficulty = when (name.lowercase()) {
@@ -56,20 +58,6 @@ enum class Difficulty(val range: IntRange, val label: String) {
             "hard" -> HARD
             else -> MEDIUM
         }
-    }
-}
-
-/**
- * Number range for practice mode.
- */
-enum class NumberRange(val label: String, val range: IntRange) {
-    RANGE_1_5("1-5", 1..5),
-    RANGE_6_10("6-10", 6..10),
-    RANGE_11_15("11-15", 11..15),
-    MIXED("Mixed", 1..20);
-
-    companion object {
-        fun fromLabel(label: String): NumberRange = entries.find { it.label == label } ?: MIXED
     }
 }
 

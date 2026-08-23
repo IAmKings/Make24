@@ -34,33 +34,11 @@ class ModelsTest {
 
     @Test
     fun `Difficulty ranges are correct`() {
-        assertEquals(1..10, Difficulty.EASY.range)
-        assertEquals(1..13, Difficulty.MEDIUM.range)
-        assertEquals(1..20, Difficulty.HARD.range)
+        assertEquals(1..6, Difficulty.EASY.range)
+        assertEquals(1..10, Difficulty.MEDIUM.range)
+        assertEquals(1..13, Difficulty.HARD.range)
     }
 
-    // ─── NumberRange ─────────────────────────────────────────────────
-
-    @Test
-    fun `NumberRange fromLabel valid`() {
-        assertEquals(NumberRange.RANGE_1_5, NumberRange.fromLabel("1-5"))
-        assertEquals(NumberRange.RANGE_6_10, NumberRange.fromLabel("6-10"))
-        assertEquals(NumberRange.RANGE_11_15, NumberRange.fromLabel("11-15"))
-        assertEquals(NumberRange.MIXED, NumberRange.fromLabel("Mixed"))
-    }
-
-    @Test
-    fun `NumberRange fromLabel unknown defaults to MIXED`() {
-        assertEquals(NumberRange.MIXED, NumberRange.fromLabel("invalid"))
-    }
-
-    @Test
-    fun `NumberRange ranges are correct`() {
-        assertEquals(1..5, NumberRange.RANGE_1_5.range)
-        assertEquals(6..10, NumberRange.RANGE_6_10.range)
-        assertEquals(11..15, NumberRange.RANGE_11_15.range)
-        assertEquals(1..20, NumberRange.MIXED.range)
-    }
 
     // ─── Language ────────────────────────────────────────────────────
 

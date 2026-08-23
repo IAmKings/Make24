@@ -2,7 +2,6 @@ package com.twentyfoursolve.core.logic
 
 import com.twentyfoursolve.core.model.Card
 import com.twentyfoursolve.core.model.Difficulty
-import com.twentyfoursolve.core.model.NumberRange
 import com.twentyfoursolve.core.model.Suit
 import kotlin.math.abs
 import kotlin.random.Random
@@ -59,7 +58,7 @@ fun solve24(numbers: List<Double>): Boolean {
 
 /**
  * Generate a valid puzzle that can be solved to 24.
- * @param difficulty Controls the range of random numbers
+ * @param difficulty Controls the range of random numbers（统一难度阶梯）
  * @return List of 4 integers guaranteed to be solvable for 24
  */
 fun generatePuzzle(difficulty: Difficulty): List<Int> {
@@ -73,23 +72,6 @@ fun generatePuzzle(difficulty: Difficulty): List<Int> {
         attempts++
     }
     // Fallback: return a known solvable puzzle (1, 2, 3, 4)
-    return listOf(1, 2, 3, 4)
-}
-
-/**
- * Generate puzzle for practice mode with custom number range.
- */
-fun generatePuzzleForRange(range: NumberRange): List<Int> {
-    val min = range.range.first
-    val max = range.range.last
-    var attempts = 0
-    while (attempts < 10000) {
-        val nums = List(4) { Random.nextInt(min, max + 1) }
-        if (solve24(nums.map { it.toDouble() })) {
-            return nums
-        }
-        attempts++
-    }
     return listOf(1, 2, 3, 4)
 }
 

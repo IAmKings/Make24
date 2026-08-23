@@ -72,7 +72,6 @@ private const val SHARE_TEXT_TEMPLATE = "24 SOLVE - %s\nScore: %d | Time: %s\nCa
 fun GameScreen(
     difficulty: String,
     isPractice: Boolean,
-    numberRange: String = "Mixed",
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = hiltViewModel()
@@ -85,9 +84,9 @@ fun GameScreen(
     BackHandler { showExitDialog = true }
 
     // Initialize the game when composable enters
-    LaunchedEffect(difficulty, isPractice, numberRange) {
+    LaunchedEffect(difficulty, isPractice) {
         val diff = Difficulty.fromName(difficulty)
-        viewModel.startNewGame(diff, isPractice, numberRange)
+        viewModel.startNewGame(diff, isPractice)
     }
 
     Column(

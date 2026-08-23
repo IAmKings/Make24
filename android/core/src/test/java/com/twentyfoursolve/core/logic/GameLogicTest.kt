@@ -1,7 +1,6 @@
 package com.twentyfoursolve.core.logic
 
 import com.twentyfoursolve.core.model.Difficulty
-import com.twentyfoursolve.core.model.NumberRange
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -137,20 +136,6 @@ class GameLogicTest {
     fun `generatePuzzle result is solvable for 24`() {
         val puzzle = generatePuzzle(Difficulty.MEDIUM)
         assertTrue(solve24(puzzle.map { it.toDouble() }))
-    }
-
-    // ─── generatePuzzleForRange ──────────────────────────────────────
-
-    @Test
-    fun `generatePuzzleForRange respects range`() {
-        val puzzle = generatePuzzleForRange(NumberRange.RANGE_6_10)
-        assertTrue(puzzle.all { it in 6..10 })
-    }
-
-    @Test
-    fun `generatePuzzleForRange mixed range`() {
-        val puzzle = generatePuzzleForRange(NumberRange.MIXED)
-        assertTrue(puzzle.all { it in 1..20 })
     }
 
     // ─── getCardLabel ────────────────────────────────────────────────
