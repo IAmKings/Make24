@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,10 +58,9 @@ fun BottomNavBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(8.dp)
+            // 背景透明 + 去掉阴影：底部栏完全透出页面统一背景，消除非圆角区的灰色色带；
+            // 仅保留顶部大圆角裁剪，作为与内容区的视觉过渡。
             .clip(RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp))
-            .background(MaterialTheme.colorScheme.background)
-            // 水平留白加大：两端 tab 的选中 pill 避开 48dp 大圆角裁剪区，避免出现残缺色块
             .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Row(
