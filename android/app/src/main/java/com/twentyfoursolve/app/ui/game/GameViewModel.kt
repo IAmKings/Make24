@@ -7,7 +7,6 @@ import com.twentyfoursolve.app.audio.SoundType
 import com.twentyfoursolve.core.logic.createCards
 import com.twentyfoursolve.core.logic.evaluateEquation
 import com.twentyfoursolve.core.logic.generatePuzzle
-import com.twentyfoursolve.core.logic.isTwentyFour
 import com.make24.solver.ExpressionStyle
 import com.make24.solver.SolveOptions
 import com.make24.solver.Rational

@@ -1,6 +1,8 @@
 package com.twentyfoursolve.core.logic
 
 import com.twentyfoursolve.core.model.Card
+import com.make24.solver.SolveStatus
+import com.make24.solver.TwentyFourSolver
 import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.Suit
 import kotlin.math.abs
@@ -66,7 +68,8 @@ fun generatePuzzle(difficulty: Difficulty): List<Int> {
     var attempts = 0
     while (attempts < 10000) {
         val nums = List(4) { Random.nextInt(1, maxRange + 1) }
-        if (solve24(nums.map { it.toDouble() })) {
+        // 与求解器保持一致：用精确 solver 校验可解性
+        if (TwentyFourSolver.solve(nums.toIntArray()).status == SolveStatus.SOLVED) {
             return nums
         }
         attempts++
