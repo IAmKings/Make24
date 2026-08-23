@@ -24,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -79,14 +77,6 @@ fun SettingsScreen(
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        // Sound toggle
-        SettingsToggleCard(
-            title = strings["soundEnabled"] ?: "Sound Effects",
-            subtitle = strings["soundEnabledDesc"] ?: "Play sound effects during gameplay",
-            checked = settings.soundEnabled,
-            onCheckedChange = { viewModel.updateSoundEnabled(it) }
-        )
-
         // Difficulty preference
         Text(
             text = strings["difficultyPreference"]?.uppercase() ?: "DEFAULT DIFFICULTY",
@@ -137,52 +127,6 @@ fun SettingsScreen(
                 },
                 isSelected = settings.language == language,
                 onClick = { viewModel.updateLanguage(language) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun SettingsToggleCard(
-    title: String,
-    subtitle: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(CornerRadius.lg),
-        color = MaterialTheme.colorScheme.surfaceContainerLow
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = MaterialTheme.colorScheme.primary,
-                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary
-                )
             )
         }
     }
