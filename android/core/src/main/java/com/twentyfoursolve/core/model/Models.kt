@@ -20,6 +20,9 @@ data class Card(
     val label: String,
     val suit: Suit,
     val isUsed: Boolean = false,
+    // 精确分数表示：合并结果以此为准（value 仅用于兼容显示）
+    val numerator: Long = value.toLong(),
+    val denominator: Long = 1L,
     // Extension fields reserved for future card role/skin system
     val characterId: String? = null,
     val skinId: String? = null

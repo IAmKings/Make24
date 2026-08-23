@@ -10,6 +10,8 @@ import com.twentyfoursolve.core.logic.generatePuzzle
 import com.twentyfoursolve.core.logic.isTwentyFour
 import com.make24.solver.ExpressionStyle
 import com.make24.solver.SolveOptions
+import com.make24.solver.Rational
+import com.make24.solver.SolveResult
 import com.make24.solver.SolveStatus
 import com.make24.solver.TwentyFourSolver
 import com.twentyfoursolve.core.model.Card
@@ -20,6 +22,7 @@ import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.data.repository.GameRepository
 import com.twentyfoursolve.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.math.abs
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,39 +172,68 @@ class GameViewModel @Inject constructor(
         val firstCard = current.cards[firstIdx]
         val secondCard = current.cards[secondIdx]
 
-        // Division by zero check
-        if (operator == Operator.DIVIDE && secondCard.value == 0.0) return
+        // 精确分数计算（n1/d1 op n2/d2）
+        val n1 = firstCard.numerator
+        val d1 = firstCard.denominator
+        val n2 = secondCard.numerator
+        val d2 = secondCard.denominator
 
-        val result = when (operator) {
-            Operator.PLUS -> firstCard.value + secondCard.value
-            Operator.MINUS -> firstCard.value - secondCard.value
-            Operator.MULTIPLY -> firstCard.value * secondCard.value
-            Operator.DIVIDE -> firstCard.value / secondCard.value
+        var rn: Long
+        var rd: Long
+        when (operator) {
+            Operator.PLUS -> {
+                rn = n1 * d2 + n2 * d1
+                rd = d1 * d2
+            }
+            Operator.MINUS -> {
+                rn = n1 * d2 - n2 * d1
+                rd = d1 * d2
+            }
+            Operator.MULTIPLY -> {
+                rn = n1 * n2
+                rd = d1 * d2
+            }
+            Operator.DIVIDE -> {
+                if (n2 == 0L) return // 除零
+                rn = n1 * d2
+                rd = d1 * n2
+            }
+        }
+        // 符号归一 + 约分
+        if (rd < 0) {
+            rn = -rn
+            rd = -rd
+        }
+        val g = gcd(abs(rn), rd)
+        if (g != 1L) {
+            rn /= g
+            rd /= g
         }
 
+        val result = rn.toDouble() / rd.toDouble()
         if (result.isNaN() || result.isInfinite()) return
 
         // Save history for undo
         val newHistory: List<List<Card>> = current.history + listOf(current.cards.map { it.copy() })
 
-        // Create new card list
-        val resultLabel = if (result == result.toInt().toDouble()) {
-            result.toInt().toString()
-        } else {
-            String.format("%.1f", result).trimEnd('0').trimEnd('.')
-        }
+        // 结果标签：整数直接显示，分数显示 n/d
+        val resultLabel = if (rd == 1L) rn.toString() else "$rn/$rd"
 
         val newCards = current.cards.toMutableList()
         newCards[firstIdx] = firstCard.copy(isUsed = true, id = "used-${System.currentTimeMillis()}")
         newCards[secondIdx] = secondCard.copy(
             id = "card-res-${System.currentTimeMillis()}",
             value = result,
-            label = resultLabel
+            label = resultLabel,
+            numerator = rn,
+            denominator = rd
         )
 
         val remainingCards = newCards.filter { !it.isUsed }
 
-        val isSuccess = remainingCards.size == 1 && isTwentyFour(remainingCards[0].value)
+        // 精确目标判断：n/d == 24/1
+        val isSuccess = remainingCards.size == 1 &&
+            remainingCards[0].numerator == 24L * remainingCards[0].denominator
         val isGameOver = remainingCards.size <= 1
 
         _state.value = current.copy(
@@ -245,20 +277,38 @@ class GameViewModel @Inject constructor(
         startNewGame(_state.value.difficulty, currentIsPractice)
     }
 
-    /** 请求提示：用求解器算出当前牌面的一个解法表达式（紧凑格式）。 */
+    /** 请求提示：按当前剩余牌数分派求解器（4 张 → solve，3 张 → solveThree，2 张 → solveTwo）。 */
     fun requestHint() {
-        val nums = currentCardValues()
-        val result = TwentyFourSolver.solve(nums, SolveOptions(style = ExpressionStyle.COMPACT))
-        _state.value = _state.value.copy(
-            hint = if (result.status == SolveStatus.SOLVED) result.expression else null
-        )
+        val hint = solveCurrentBoard(ExpressionStyle.COMPACT)?.expression
+        _state.value = _state.value.copy(hint = hint)
     }
 
-    /** 无解按钮：检查当前牌面是否有解（生成器保证有解，此按钮用于给玩家反馈/确认）。 */
+    /** 无解按钮：检查当前剩余牌面是否有解（生成器保证初始有解，合并后可能走错）。 */
     fun checkUnsolvable() {
-        val nums = currentCardValues()
-        val result = TwentyFourSolver.solve(nums)
-        _state.value = _state.value.copy(solvable = result.status == SolveStatus.SOLVED)
+        val solved = solveCurrentBoard(ExpressionStyle.FULLY_PARENTHESIZED)?.status == SolveStatus.SOLVED
+        _state.value = _state.value.copy(solvable = solved)
+    }
+
+    private fun solveCurrentBoard(style: ExpressionStyle): SolveResult? {
+        val remaining = _state.value.cards.filter { !it.isUsed }
+        return when (remaining.size) {
+            4 -> TwentyFourSolver.solve(
+                remaining.map { it.numerator.toInt() }.toIntArray(),
+                SolveOptions(style = style)
+            )
+            3 -> TwentyFourSolver.solveThree(
+                Rational(remaining[0].numerator, remaining[0].denominator),
+                Rational(remaining[1].numerator, remaining[1].denominator),
+                Rational(remaining[2].numerator, remaining[2].denominator),
+                SolveOptions(style = style)
+            )
+            2 -> TwentyFourSolver.solveTwo(
+                Rational(remaining[0].numerator, remaining[0].denominator),
+                Rational(remaining[1].numerator, remaining[1].denominator),
+                SolveOptions(style = style)
+            )
+            else -> null
+        }
     }
 
     fun clearHint() {
@@ -269,8 +319,16 @@ class GameViewModel @Inject constructor(
         _state.value = _state.value.copy(solvable = null)
     }
 
-    private fun currentCardValues(): IntArray =
-        _state.value.cards.map { it.value.toInt() }.toIntArray()
+    private fun gcd(a0: Long, b0: Long): Long {
+        var a = abs(a0)
+        var b = abs(b0)
+        while (b != 0L) {
+            val t = a % b
+            a = b
+            b = t
+        }
+        return a
+    }
 
     private fun saveGameRecord() {
         val current = _state.value
