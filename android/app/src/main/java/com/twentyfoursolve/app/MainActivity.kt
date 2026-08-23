@@ -31,6 +31,7 @@ import com.twentyfoursolve.app.ui.rules.RulesScreen
 import com.twentyfoursolve.app.ui.settings.SettingsScreen
 import com.twentyfoursolve.app.ui.stats.StatsScreen
 import com.twentyfoursolve.core.model.Language
+import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.UserSettings
 import com.twentyfoursolve.data.repository.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Solve24NavHost()
+                    Solve24NavHost(defaultDifficulty = settings.difficultyPreference)
                 }
             }
         }
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Solve24NavHost() {
+fun Solve24NavHost(defaultDifficulty: Difficulty) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -89,7 +90,9 @@ fun Solve24NavHost() {
         ) {
             composable(Routes.HOME) {
                 HomeScreen(
-                    onStartGame = { navController.navigate(Routes.game("medium")) },
+                    onStartGame = {
+                        navController.navigate(Routes.game(defaultDifficulty.name.lowercase()))
+                    },
                     onPracticeMode = { navigateToTab(navController, Routes.PRACTICE_CONFIG) },
                     onNavigate = { tab ->
                         when (tab) {
