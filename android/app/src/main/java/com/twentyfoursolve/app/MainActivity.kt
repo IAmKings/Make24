@@ -91,11 +91,13 @@ fun Solve24NavHost() {
             composable(Routes.HOME) {
                 HomeScreen(
                     onStartGame = { navController.navigate(Routes.game("medium")) },
-                    onPracticeMode = { navController.navigate(Routes.PRACTICE_CONFIG) },
+                    onPracticeMode = { navigateToTab(navController, Routes.PRACTICE_CONFIG) },
                     onNavigate = { tab ->
                         when (tab) {
-                            "practice" -> navController.navigate(Routes.PRACTICE_CONFIG)
-                            else -> navController.navigate(tab)
+                            "practice" -> navigateToTab(navController, Routes.PRACTICE_CONFIG)
+                            "rules", "stats" -> navigateToTab(navController, tab)
+                            // settings 为二级页，普通导航（返回键回上一级）
+                            else -> navController.navigate(Routes.SETTINGS)
                         }
                     }
                 )
@@ -154,11 +156,19 @@ fun Solve24NavHost() {
     }
 }
 
-/** 底部导航切换：单顶入栈 + 保存/恢复各 tab 状态（官方推荐模式）。 */
+/**
+ * 底部导航切换。
+ *
+ * 注意：不能使用 launchSingleTop —— 从 tab A 切到 tab B 时，popUpTo 会先把 A 弹出，
+ * 若目标路由此时恰好位于栈顶，launchSingleTop 会拦截压栈，导致没有新导航事件，
+ * currentBackStackEntry 不更新，UI 表现为"点击无响应"。
+ * 改为：目标页已是当前页则直接忽略；否则弹回起始页（保留各 tab 状态）后压入目标页，
+ * 保证每次切换都产生真实的导航事件。
+ */
 private fun navigateToTab(navController: NavHostController, route: String) {
+    if (navController.currentDestination?.route == route) return
     navController.navigate(route) {
         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-        launchSingleTop = true
         restoreState = true
     }
 }
