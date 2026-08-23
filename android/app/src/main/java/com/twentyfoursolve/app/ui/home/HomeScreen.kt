@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
@@ -73,15 +74,22 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-            // 应用图标（24point-adaptive-icon）作为首页顶部视觉，圆形展示
-            Image(
-                painter = painterResource(R.drawable.ic_launcher_foreground),
-                contentDescription = null,
+            // 应用图标（24point-adaptive-icon）作为首页顶部视觉：
+            // 圆形蓝底容器 + 图标内容缩小至中心安全区，保证四张卡片完整显示不被圆裁剪
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(176.dp)
                     .clip(CircleShape)
+                    .background(Color(0xFF0058BB))
                     .padding(bottom = 16.dp)
-            )
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    contentDescription = null,
+                    modifier = Modifier.size(112.dp)
+                )
+            }
 
             // Tagline
             Text(
