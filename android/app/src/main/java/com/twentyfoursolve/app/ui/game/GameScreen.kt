@@ -345,7 +345,6 @@ private fun GameHud(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Back button（紧凑，省出空间给剩余时间与得分）
@@ -358,6 +357,9 @@ private fun GameHud(
                     .clip(CircleShape)
                     .clickable(onClick = onBack)
             )
+
+            // 返回按钮与剩余时间之间的间隔
+            Spacer(modifier = Modifier.width(12.dp))
 
             // Time remaining（占据中间弹性空间）
             Column(modifier = Modifier.weight(1f)) {
@@ -391,8 +393,11 @@ private fun GameHud(
                 }
             }
 
-            // Score
-            Column(horizontalAlignment = Alignment.End) {
+            // Score（右侧留出边距，不紧贴 HUD 边缘）
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(start = 12.dp, end = 4.dp)
+            ) {
                 Text(
                     text = scoreLabel.uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
