@@ -158,7 +158,7 @@ fun HomeScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(72.dp)
                     .clip(RoundedCornerShape(CornerRadius.full))
                     .clickable(onClick = onPracticeMode),
                 shape = RoundedCornerShape(CornerRadius.full),
@@ -173,14 +173,14 @@ fun HomeScreen(
                             imageVector = Icons.Filled.FitnessCenter,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = strings["practiceMode"] ?: "Practice Mode",
-                            style = MaterialTheme.typography.titleMedium.copy(
+                            style = MaterialTheme.typography.headlineSmall.copy(
                                 fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             ),
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
