@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -106,6 +108,46 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.height(Spacing.sm))
+
+        // Allow unsolvable hands
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(CornerRadius.lg),
+            color = MaterialTheme.colorScheme.surfaceContainerLow
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = strings["allowUnsolvable"] ?: "Allow Unsolvable Hands",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Text(
+                        text = strings["allowUnsolvableDesc"]
+                            ?: "Medium & Hard may deal unsolvable hands. Easy is always solvable.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Switch(
+                    checked = settings.allowUnsolvable,
+                    onCheckedChange = { viewModel.updateAllowUnsolvable(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                )
+            }
+        }
 
         // Language selection
         Text(

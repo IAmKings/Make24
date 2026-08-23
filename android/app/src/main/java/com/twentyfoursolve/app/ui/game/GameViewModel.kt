@@ -47,11 +47,13 @@ class GameViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var totalGameTime = 120 // seconds
     private var currentIsPractice = false
+    private var allowUnsolvable = true
 
     init {
         viewModelScope.launch {
             settingsRepository.settings.collect { settings ->
                 soundManager.enabled = settings.soundEnabled
+                allowUnsolvable = settings.allowUnsolvable
             }
         }
     }
@@ -60,8 +62,9 @@ class GameViewModel @Inject constructor(
         currentIsPractice = isPractice
         timerJob?.cancel()
 
-        // 统一难度阶梯：普通局与练习局都由难度决定数字范围
-        val puzzle = generatePuzzle(difficulty)
+        // 统一难度阶梯：普通局与练习局都由难度决定数字范围；
+        // 是否允许无解由设置配置（简单难度始终有解）
+        val puzzle = generatePuzzle(difficulty, allowUnsolvable)
 
         val cards = createCards(puzzle)
         totalGameTime = if (isPractice) Int.MAX_VALUE else 120
@@ -70,6 +73,7 @@ class GameViewModel @Inject constructor(
             cards = cards,
             difficulty = difficulty,
             timeRemaining = if (isPractice) Int.MAX_VALUE else 120,
+            allowUnsolvable = allowUnsolvable,
             isGameOver = false,
             isSuccess = false,
             history = emptyList(),

@@ -104,37 +104,37 @@ class GameLogicTest {
 
     @Test
     fun `generatePuzzle returns 4 numbers`() {
-        val puzzle = generatePuzzle(Difficulty.MEDIUM)
+        val puzzle = generatePuzzle(Difficulty.MEDIUM, allowUnsolvable = false)
         assertEquals(4, puzzle.size)
     }
 
     @Test
     fun `generatePuzzle numbers are positive`() {
-        val puzzle = generatePuzzle(Difficulty.EASY)
+        val puzzle = generatePuzzle(Difficulty.EASY, allowUnsolvable = false)
         assertTrue(puzzle.all { it > 0 })
     }
 
     @Test
     fun `generatePuzzle easy range is within 1-10`() {
-        val puzzle = generatePuzzle(Difficulty.EASY)
+        val puzzle = generatePuzzle(Difficulty.EASY, allowUnsolvable = false)
         assertTrue(puzzle.all { it in 1..10 })
     }
 
     @Test
     fun `generatePuzzle medium range is within 1-13`() {
-        val puzzle = generatePuzzle(Difficulty.MEDIUM)
+        val puzzle = generatePuzzle(Difficulty.MEDIUM, allowUnsolvable = false)
         assertTrue(puzzle.all { it in 1..13 })
     }
 
     @Test
     fun `generatePuzzle hard range is within 1-20`() {
-        val puzzle = generatePuzzle(Difficulty.HARD)
+        val puzzle = generatePuzzle(Difficulty.HARD, allowUnsolvable = false)
         assertTrue(puzzle.all { it in 1..20 })
     }
 
     @Test
     fun `generatePuzzle result is solvable for 24`() {
-        val puzzle = generatePuzzle(Difficulty.MEDIUM)
+        val puzzle = generatePuzzle(Difficulty.MEDIUM, allowUnsolvable = false)
         assertTrue(solve24(puzzle.map { it.toDouble() }))
     }
 

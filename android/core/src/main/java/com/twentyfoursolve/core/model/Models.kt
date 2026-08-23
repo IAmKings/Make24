@@ -94,7 +94,9 @@ data class GameState(
     /** 可解性检查结果：null=未检查，true=有解，false=无解。 */
     val solvable: Boolean? = null,
     /** 简单难度下合并被拒绝（合并后剩余牌面无解）。 */
-    val mergeRejected: Boolean = false
+    val mergeRejected: Boolean = false,
+    /** 是否允许无解题（设置配置；决定无解按钮可用性）。 */
+    val allowUnsolvable: Boolean = true
 )
 
 /**
@@ -116,5 +118,7 @@ data class GameRecord(
 data class UserSettings(
     val soundEnabled: Boolean = true,
     val difficultyPreference: Difficulty = Difficulty.MEDIUM,
-    val language: Language = Language.ZH
+    val language: Language = Language.ZH,
+    /** 是否允许开局出现无解题（中高难度；简单难度始终无无解）。 */
+    val allowUnsolvable: Boolean = true
 )

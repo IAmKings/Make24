@@ -32,4 +32,8 @@ class SettingsViewModel @Inject constructor(
     fun updateLanguage(language: Language) {
         viewModelScope.launch { settingsRepository.updateLanguage(language) }
     }
+
+    fun updateAllowUnsolvable(allow: Boolean) {
+        viewModelScope.launch { settingsRepository.updateAllowUnsolvable(allow) }
+    }
 }

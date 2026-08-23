@@ -59,15 +59,20 @@ fun solve24(numbers: List<Double>): Boolean {
 }
 
 /**
- * Generate a valid puzzle that can be solved to 24.
+ * Generate a puzzle.
  * @param difficulty Controls the range of random numbers（统一难度阶梯）
- * @return List of 4 integers guaranteed to be solvable for 24
+ * @param allowUnsolvable 是否允许无解题（中等/困难且开启时，随机发牌可能无解，贴近真实牌局；
+ *                        简单难度与关闭该配置时，始终用精确 solver 校验保证有解）
+ * @return List of 4 integers
  */
-fun generatePuzzle(difficulty: Difficulty): List<Int> {
+fun generatePuzzle(difficulty: Difficulty, allowUnsolvable: Boolean): List<Int> {
     val maxRange = difficulty.range.last
+    // 简单难度始终可解；其他难度按配置决定是否校验
+    val mustBeSolvable = difficulty == Difficulty.EASY || !allowUnsolvable
     var attempts = 0
     while (attempts < 10000) {
         val nums = List(4) { Random.nextInt(1, maxRange + 1) }
+        if (!mustBeSolvable) return nums
         // 与求解器保持一致：用精确 solver 校验可解性
         if (TwentyFourSolver.solve(nums.toIntArray()).status == SolveStatus.SOLVED) {
             return nums

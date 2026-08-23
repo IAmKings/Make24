@@ -98,6 +98,8 @@ private val englishStrings = mapOf(
     "soundEnabled" to "Sound Effects",
     "soundEnabledDesc" to "Play sound effects during gameplay",
     "difficultyPreference" to "Default Difficulty",
+    "allowUnsolvable" to "Allow Unsolvable Hands",
+    "allowUnsolvableDesc" to "Medium & Hard may deal unsolvable hands, like a real deck. Easy is always solvable.",
     "languageLabel" to "Language",
     "noData" to "No games played yet. Start playing to see your stats!"
 )
@@ -182,6 +184,8 @@ private val chineseStrings = mapOf(
     "soundEnabled" to "音效",
     "soundEnabledDesc" to "游戏过程中播放音效",
     "difficultyPreference" to "默认难度",
+    "allowUnsolvable" to "允许无解题",
+    "allowUnsolvableDesc" to "中等/困难可能开出无解牌局，更贴近真实牌局。简单始终可解。",
     "languageLabel" to "语言",
     "noData" to "还没有游戏记录。开始游戏后可查看统计！"
 )

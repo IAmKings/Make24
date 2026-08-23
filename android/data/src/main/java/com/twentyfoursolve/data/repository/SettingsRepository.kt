@@ -23,13 +23,15 @@ class SettingsRepository @Inject constructor(
         val KEY_SOUND_ENABLED = stringPreferencesKey("sound_enabled")
         val KEY_DIFFICULTY = stringPreferencesKey("difficulty")
         val KEY_LANGUAGE = stringPreferencesKey("language")
+        val KEY_ALLOW_UNSOLVABLE = stringPreferencesKey("allow_unsolvable")
     }
 
     val settings: Flow<UserSettings> = dataStore.data.map { prefs ->
         UserSettings(
             soundEnabled = prefs[KEY_SOUND_ENABLED]?.toBoolean() ?: true,
             difficultyPreference = Difficulty.fromName(prefs[KEY_DIFFICULTY] ?: "medium"),
-            language = Language.fromCode(prefs[KEY_LANGUAGE] ?: "zh")
+            language = Language.fromCode(prefs[KEY_LANGUAGE] ?: "zh"),
+            allowUnsolvable = prefs[KEY_ALLOW_UNSOLVABLE]?.toBoolean() ?: true
         )
     }
 
@@ -43,5 +45,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun updateLanguage(language: Language) {
         dataStore.edit { it[KEY_LANGUAGE] = language.code }
+    }
+
+    suspend fun updateAllowUnsolvable(allow: Boolean) {
+        dataStore.edit { it[KEY_ALLOW_UNSOLVABLE] = allow.toString() }
     }
 }
