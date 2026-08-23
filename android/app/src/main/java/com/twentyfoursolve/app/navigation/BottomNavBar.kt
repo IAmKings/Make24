@@ -61,10 +61,9 @@ fun BottomNavBar(
             .fillMaxWidth()
             .shadow(8.dp)
             .clip(RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp))
-            .background(
-                MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.95f)
-            )
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .background(MaterialTheme.colorScheme.background)
+            // 水平留白加大：两端 tab 的选中 pill 避开 48dp 大圆角裁剪区，避免出现残缺色块
+            .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

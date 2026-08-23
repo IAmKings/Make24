@@ -142,7 +142,7 @@ fun Solve24NavHost() {
             }
 
             composable(Routes.RULES) {
-                RulesScreen(onBack = { navController.popBackStack() })
+                RulesScreen()
             }
 
             composable(Routes.STATS) {

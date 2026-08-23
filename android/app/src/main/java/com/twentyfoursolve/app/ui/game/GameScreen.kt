@@ -423,6 +423,8 @@ private fun OperatorButton(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Black,
+                    fontSize = 28.sp,
+                    lineHeight = 28.sp,
                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.onSecondaryContainer
                 )

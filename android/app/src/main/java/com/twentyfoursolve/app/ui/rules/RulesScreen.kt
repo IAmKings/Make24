@@ -1,7 +1,6 @@
 package com.twentyfoursolve.app.ui.rules
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Icon
@@ -32,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twentyfoursolve.app.theme.CornerRadius
@@ -41,7 +39,6 @@ import com.twentyfoursolve.app.theme.Spacing
 
 @Composable
 fun RulesScreen(
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val strings = LocalStringProvider.current
@@ -154,39 +151,8 @@ fun RulesScreen(
             }
         }
 
-        // 为底部固定返回按钮预留空间
-        Spacer(modifier = Modifier.height(72.dp))
-        }
-
-        // Back to Home（固定在底部，不随内容滚动）
-        Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(CornerRadius.full))
-                .clickable(onClick = onBack),
-            shape = RoundedCornerShape(CornerRadius.full),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Home,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = strings["backToHome"] ?: "Back to Home",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-            }
+        // 内容底部留白
+        Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -312,9 +278,14 @@ private fun RuleCard(
                                     Text(
                                         text = op.symbol,
                                         style = MaterialTheme.typography.headlineSmall.copy(
-                                            fontWeight = FontWeight.Black
+                                            fontSize = 24.sp,
+                                            lineHeight = 24.sp,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center
                                         ),
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.fillMaxSize(),
+                                        textAlign = TextAlign.Center
                                     )
                                 }
                             }
