@@ -155,7 +155,10 @@ fun NumberCard(
                         lineHeight = 64.sp,
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     ),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    // 强制单行：两位数（如 10）在窄卡片中换行会被误看成 1
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
 
