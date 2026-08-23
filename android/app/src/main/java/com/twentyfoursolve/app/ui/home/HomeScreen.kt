@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
@@ -67,9 +66,8 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
         // Hero Section
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
             // Glow effect behind "24"
@@ -196,19 +194,6 @@ fun HomeScreen(
                     }
                 }
             }
-        }
-
-        // 设置入口：首页右上角小图标（位于 Hero Box 右上角）
-        IconButton(
-            onClick = { onNavigate("settings") },
-            modifier = Modifier.align(Alignment.TopEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Settings,
-                contentDescription = strings["settings"] ?: "Settings",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
         }
 
         // Bento Grid Navigation（根 Column 子项，Hero 下方原位）
