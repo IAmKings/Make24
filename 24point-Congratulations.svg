@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432" fill="none">
+  <title>Arithmetickle reward star adaptive icon</title>
+  <desc>Golden reward star trophy on a solar orange field with electric blue celebration accents.</desc>
+  <defs>
+    <radialGradient id="sun" cx="42%" cy="35%" r="70%"><stop stop-color="#FFC794"/><stop offset=".48" stop-color="#FFB52E"/><stop offset="1" stop-color="#F59B16"/></radialGradient>
+    <linearGradient id="gold" x1="120" y1="92" x2="305" y2="304" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF1A6"/><stop offset=".3" stop-color="#FECB00"/><stop offset=".72" stop-color="#E58A00"/><stop offset="1" stop-color="#884D00"/></linearGradient>
+    <linearGradient id="goldLight" x1="165" y1="145" x2="235" y2="286" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF9D1"/><stop offset="1" stop-color="#F5B324"/></linearGradient>
+    <linearGradient id="pedestal" x1="155" y1="288" x2="278" y2="342" gradientUnits="userSpaceOnUse"><stop stop-color="#4D515B"/><stop offset="1" stop-color="#20242B"/></linearGradient>
+    <filter id="shadow" x="90" y="285" width="260" height="80" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+
+  <rect width="432" height="432" fill="#0058BB"/>
+  <circle cx="216" cy="216" r="184" fill="url(#sun)"/>
+  <ellipse cx="216" cy="331" rx="107" ry="17" fill="#884D00" opacity=".28" filter="url(#shadow)"/>
+
+  <!-- Celebration confetti -->
+  <g stroke-linecap="round" stroke-width="5">
+    <path d="M142 92c18 12 3 23 15 34s-5 22-1 30" stroke="#FFF1A6"/>
+    <path d="M287 114c-12 10-23 0-28 16s-13 11-16 26" stroke="#0058BB"/>
+    <path d="M320 249c-17 12-2 25-14 37s-5 19-3 27" stroke="#EF4D74"/>
+    <path d="M125 259c15 8 4 20-5 25s-2 19-14 24" stroke="#E83D83"/>
+    <path d="M277 276c11-4 9 14 20 17s2 16 15 19" stroke="#24B980"/>
+  </g>
+  <g fill="#0058BB"><path d="m87 171 18-5 8 19-17 13z"/><path d="m326 188 17 10-5 20-18-9z"/></g>
+  <g fill="#FECB00"><circle cx="108" cy="137" r="4"/><circle cx="158" cy="112" r="5"/><circle cx="292" cy="158" r="4"/><circle cx="111" cy="210" r="3"/></g>
+  <g fill="#E83D83"><circle cx="119" cy="108" r="3"/><circle cx="292" cy="81" r="3"/></g>
+  <path d="m242 87 13 17-24 8z" fill="#FECB00"/>
+  <path d="m326 137 11 16-22 3z" fill="#E83D83"/>
+  <path d="m109 226 19 9-16 16z" fill="#E83D83"/>
+
+  <!-- Five-point reward star -->
+  <path d="m216 111 27 61 67 6-51 44 16 65-59-35-59 35 16-65-51-44 67-6 27-61Z" fill="url(#gold)" stroke="#884D00" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m216 126 20 58 61 6-47 37 14 48-48-29z" fill="#FFF5B4" opacity=".9"/>
+  <path d="m216 126v120l-43 29 16-54-43-37 58-5z" fill="#FFFBE0" opacity=".85"/>
+  <path d="m216 246 59 35-59-14z" fill="#C96E00" opacity=".78"/>
+  <path d="m216 246-43 29 43-14z" fill="#F4A700" opacity=".95"/>
+
+  <!-- Trophy stem and pedestal -->
+  <path d="M192 277h48l12 37h-72z" fill="url(#goldLight)" stroke="#884D00" stroke-width="4"/>
+  <path d="M176 307h80l18 18H158z" fill="#FECB00" stroke="#884D00" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M158 325h116v25H158z" fill="url(#pedestal)"/>
+  <path d="M158 325h116" stroke="#20242B" stroke-width="4"/>
+  <path d="M173 329h86v4h-86z" fill="#6C9FFF" opacity=".5"/>
+</svg>
