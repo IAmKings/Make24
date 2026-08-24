@@ -82,8 +82,9 @@ class GameViewModel @Inject constructor(
             history = emptyList(),
             selectedCardIndices = emptySet(),
             currentOperator = null,
-            // 闯关模式：成功进入下一关时延续累计分数，否则从 0 开始
-            score = if (carryScore) _state.value.score else 0
+            // 闯关模式：成功进入下一关时延续累计分数，否则从 0 开始；本关得分重置
+            score = if (carryScore) _state.value.score else 0,
+            roundScore = 0
         )
 
         if (!isPractice) {
@@ -272,22 +273,25 @@ class GameViewModel @Inject constructor(
             remainingCards[0].numerator == 24L * remainingCards[0].denominator
         val isGameOver = remainingCards.size <= 1
 
+        // 本关得分（成功时按难度系数/时间/步数/连胜计算），score 为累计总分
+        val roundScore = if (isSuccess) {
+            computeFinalScore(
+                difficulty = current.difficulty,
+                timeRemaining = current.timeRemaining,
+                mergeSteps = current.history.size + 1,
+                streak = cachedStreak
+            )
+        } else {
+            0
+        }
+
         _state.value = current.copy(
             cards = newCards,
             selectedCardIndices = emptySet(),
             currentOperator = null,
             history = newHistory,
-            score = if (isSuccess) {
-                // 同步计分：本关得分（难度系数 + 时间奖励 + 步数奖励 + 连胜加成）累加到累计分数
-                current.score + computeFinalScore(
-                    difficulty = current.difficulty,
-                    timeRemaining = current.timeRemaining,
-                    mergeSteps = current.history.size + 1,
-                    streak = cachedStreak
-                )
-            } else {
-                current.score
-            },
+            score = current.score + roundScore,
+            roundScore = roundScore,
             isGameOver = isGameOver,
             isSuccess = isSuccess
         )
@@ -479,6 +483,7 @@ class GameViewModel @Inject constructor(
             val reward = ((500 + streak * 100) * current.difficulty.multiplier).roundToInt()
             _state.value = current.copy(
                 score = current.score + reward,
+                roundScore = reward,
                 isSuccess = true,
                 solvable = null,
                 unsolvablePenalty = false

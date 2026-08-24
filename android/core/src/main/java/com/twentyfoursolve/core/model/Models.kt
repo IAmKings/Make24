@@ -102,7 +102,9 @@ data class GameState(
     /** 开局 4 张牌值（无解按钮仅回答开局是否无解）。 */
     val initialPuzzle: List<Int> = emptyList(),
     /** 无解回答猜错（牌面有解）已施加惩罚。 */
-    val unsolvablePenalty: Boolean = false
+    val unsolvablePenalty: Boolean = false,
+    /** 本关得分（成功时的新增分数，用于结算展示）。 */
+    val roundScore: Int = 0
 )
 
 /**

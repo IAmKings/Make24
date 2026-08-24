@@ -215,7 +215,7 @@ fun GameScreen(
         ResultModal(
             isSuccess = state.isSuccess,
             timeTaken = if (isPractice) 0 else (120 - state.timeRemaining),
-            score = state.score,
+            score = state.roundScore,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
             strings = strings,
