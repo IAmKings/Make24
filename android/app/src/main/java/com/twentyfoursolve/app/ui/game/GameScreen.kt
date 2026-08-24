@@ -839,12 +839,15 @@ private fun StatCard(
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineMedium.copy(
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Black,
                     letterSpacing = (-1).sp
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                // 单行：4 位数分数/时间不换行，避免 UI 异常
+                maxLines = 1,
+                softWrap = false
             )
         }
     }

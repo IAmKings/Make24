@@ -59,7 +59,7 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun startNewGame(difficulty: Difficulty, isPractice: Boolean) {
+    fun startNewGame(difficulty: Difficulty, isPractice: Boolean, carryScore: Boolean = false) {
         currentIsPractice = isPractice
         timerJob?.cancel()
 
@@ -81,7 +81,8 @@ class GameViewModel @Inject constructor(
             history = emptyList(),
             selectedCardIndices = emptySet(),
             currentOperator = null,
-            score = 0
+            // 闯关模式：成功进入下一关时延续累计分数，否则从 0 开始
+            score = if (carryScore) _state.value.score else 0
         )
 
         if (!isPractice) {
@@ -333,7 +334,12 @@ class GameViewModel @Inject constructor(
     }
 
     fun onNextRound() {
-        abandonToNewRound()
+        // 成功过关：下一关延续累计分数（闯关模式）；失败/无解换题：放弃并清零
+        if (_state.value.isSuccess) {
+            startNewGame(_state.value.difficulty, currentIsPractice, carryScore = true)
+        } else {
+            abandonToNewRound()
+        }
     }
 
     /**
