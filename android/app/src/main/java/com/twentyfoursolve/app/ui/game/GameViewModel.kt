@@ -278,8 +278,8 @@ class GameViewModel @Inject constructor(
             currentOperator = null,
             history = newHistory,
             score = if (isSuccess) {
-                // 同步计分：难度系数 + 时间奖励 + 步数奖励 + 连胜加成（连胜用缓存值，无异步竞态）
-                computeFinalScore(
+                // 同步计分：本关得分（难度系数 + 时间奖励 + 步数奖励 + 连胜加成）累加到累计分数
+                current.score + computeFinalScore(
                     difficulty = current.difficulty,
                     timeRemaining = current.timeRemaining,
                     mergeSteps = current.history.size + 1,
