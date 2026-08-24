@@ -459,6 +459,31 @@ class GameViewModel @Inject constructor(
         return a
     }
 
+    /**
+     * 正确识别无解 = 过关胜利：保存成功记录（连胜 +1）、按难度给奖励分、
+     * 分数延续进入下一关。
+     * 奖励 = (500 + 当前连胜×100) × 难度系数。
+     */
+    fun confirmUnsolvableWin() {
+        val current = _state.value
+        if (currentIsPractice) {
+            startNewGame(current.difficulty, true, carryScore = true)
+            return
+        }
+        viewModelScope.launch {
+            val streak = gameRepository.getCurrentStreak()
+            val reward = ((500 + streak * 100) * current.difficulty.multiplier).roundToInt()
+            _state.value = current.copy(
+                score = current.score + reward,
+                isSuccess = true,
+                solvable = null,
+                unsolvablePenalty = false
+            )
+            saveGameRecord()
+            startNewGame(current.difficulty, currentIsPractice, carryScore = true)
+        }
+    }
+
     private fun saveGameRecord() {
         val current = _state.value
         if (currentIsPractice) return // Practice mode doesn't count towards stats

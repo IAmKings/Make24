@@ -280,7 +280,8 @@ fun GameScreen(
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearSolvable()
-                    if (!solvable) viewModel.onNextRound()
+                    // 确实无解 = 正确识别，视为过关胜利（保存成功记录 + 奖励分 + 延续下一关）
+                    if (!solvable) viewModel.confirmUnsolvableWin()
                 }) {
                     Text(strings["gotIt"] ?: "Got It")
                 }
