@@ -100,7 +100,9 @@ data class GameState(
     /** 提示结果为无解（当前牌面无法到 24，作为回答展示）。 */
     val hintUnsolvable: Boolean = false,
     /** 开局 4 张牌值（无解按钮仅回答开局是否无解）。 */
-    val initialPuzzle: List<Int> = emptyList()
+    val initialPuzzle: List<Int> = emptyList(),
+    /** 无解回答猜错（牌面有解）已施加惩罚。 */
+    val unsolvablePenalty: Boolean = false
 )
 
 /**

@@ -347,13 +347,31 @@ class GameViewModel @Inject constructor(
 
     /**
      * 无解按钮：仅回答开局发牌是否无解（在允许无解牌局的模式下）。
-     * 不参与用户操作后的局面判断——操作后的无解由提示按钮承担。
+     * 视为一次"回答"：牌面其实有解时视为答错，扣 300 分 + 15 秒（练习模式仅扣分），
+     * 避免玩家用无解按钮免费试探开局可解性。
      */
     fun checkUnsolvable() {
-        val initial = _state.value.initialPuzzle
-        val solved = initial.isNotEmpty() &&
-            TwentyFourSolver.solve(initial.toIntArray()).status == SolveStatus.SOLVED
-        _state.value = _state.value.copy(solvable = solved)
+        val current = _state.value
+        val initial = current.initialPuzzle
+        if (initial.isEmpty()) return
+        val solved = TwentyFourSolver.solve(initial.toIntArray()).status == SolveStatus.SOLVED
+        if (solved) {
+            // 答错：扣分 + 扣时
+            val newScore = maxOf(0, current.score - 300)
+            val newTime = if (currentIsPractice) {
+                current.timeRemaining
+            } else {
+                maxOf(1, current.timeRemaining - 15)
+            }
+            _state.value = current.copy(
+                solvable = true,
+                unsolvablePenalty = true,
+                score = newScore,
+                timeRemaining = newTime
+            )
+        } else {
+            _state.value = current.copy(solvable = false, unsolvablePenalty = false)
+        }
     }
 
     private fun solveCurrentBoard(style: ExpressionStyle): SolveResult? {
@@ -383,7 +401,7 @@ class GameViewModel @Inject constructor(
     }
 
     fun clearSolvable() {
-        _state.value = _state.value.copy(solvable = null)
+        _state.value = _state.value.copy(solvable = null, unsolvablePenalty = false)
     }
 
     fun clearMergeRejected() {

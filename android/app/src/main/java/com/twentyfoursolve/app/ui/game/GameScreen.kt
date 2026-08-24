@@ -266,7 +266,12 @@ fun GameScreen(
             text = {
                 Text(
                     if (solvable) {
-                        strings["unsolvableHasSolution"] ?: "This hand is solvable — keep trying!"
+                        if (state.unsolvablePenalty) {
+                            strings["unsolvablePenalty"]
+                                ?: "Wrong! This hand IS solvable. -300 points and -15 seconds."
+                        } else {
+                            strings["unsolvableHasSolution"] ?: "This hand is solvable — keep trying!"
+                        }
                     } else {
                         strings["unsolvableNone"] ?: "This hand has no solution."
                     }
