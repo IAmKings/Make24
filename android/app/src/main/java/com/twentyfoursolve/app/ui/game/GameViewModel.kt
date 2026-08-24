@@ -82,9 +82,10 @@ class GameViewModel @Inject constructor(
             history = emptyList(),
             selectedCardIndices = emptySet(),
             currentOperator = null,
-            // 闯关模式：成功进入下一关时延续累计分数，否则从 0 开始；本关得分重置
+            // 闯关模式：成功进入下一关时延续累计分数与累计用时，否则从 0 开始；本关得分重置
             score = if (carryScore) _state.value.score else 0,
-            roundScore = 0
+            roundScore = 0,
+            accumulatedTime = if (carryScore) _state.value.accumulatedTime else 0
         )
 
         if (!isPractice) {
@@ -284,6 +285,8 @@ class GameViewModel @Inject constructor(
         } else {
             0
         }
+        // 当关用时（秒），游戏结束时累加到累计用时
+        val roundTime = if (isGameOver) (totalGameTime - current.timeRemaining).coerceAtLeast(0) else 0
 
         _state.value = current.copy(
             cards = newCards,
@@ -292,6 +295,7 @@ class GameViewModel @Inject constructor(
             history = newHistory,
             score = current.score + roundScore,
             roundScore = roundScore,
+            accumulatedTime = current.accumulatedTime + roundTime,
             isGameOver = isGameOver,
             isSuccess = isSuccess
         )
@@ -356,13 +360,15 @@ class GameViewModel @Inject constructor(
      */
     private fun abandonToNewRound() {
         val current = _state.value
+        val abandonTime = current.accumulatedTime +
+            (totalGameTime - current.timeRemaining).coerceAtLeast(0)
         if (!currentIsPractice && !current.isGameOver) {
             viewModelScope.launch {
                 gameRepository.saveGameRecord(
                     GameRecord(
                         isSuccess = false,
                         score = current.score,
-                        timeTaken = totalGameTime - current.timeRemaining,
+                        timeTaken = abandonTime,
                         difficulty = current.difficulty.name.lowercase(),
                         mode = "timed"
                     )
@@ -498,7 +504,7 @@ class GameViewModel @Inject constructor(
         if (currentIsPractice) return // Practice mode doesn't count towards stats
 
         viewModelScope.launch {
-            val timeTaken = totalGameTime - current.timeRemaining
+            val timeTaken = current.accumulatedTime
             gameRepository.saveGameRecord(
                 GameRecord(
                     isSuccess = current.isSuccess,

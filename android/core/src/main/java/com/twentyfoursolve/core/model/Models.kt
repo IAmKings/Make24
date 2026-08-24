@@ -104,7 +104,9 @@ data class GameState(
     /** 无解回答猜错（牌面有解）已施加惩罚。 */
     val unsolvablePenalty: Boolean = false,
     /** 本关得分（成功时的新增分数，用于结算展示）。 */
-    val roundScore: Int = 0
+    val roundScore: Int = 0,
+    /** 累计用时（秒）：连续通关时跨关累加，与累计得分对齐。 */
+    val accumulatedTime: Int = 0
 )
 
 /**
