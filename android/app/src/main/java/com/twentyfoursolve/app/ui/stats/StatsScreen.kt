@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,6 +55,11 @@ fun StatsScreen(
 ) {
     val strings = LocalStringProvider.current
     val stats by viewModel.stats.collectAsState()
+
+    // 每次进入统计页刷新数据（活跃度/历史最佳等在游戏后更新）
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
 
     Column(
         modifier = modifier

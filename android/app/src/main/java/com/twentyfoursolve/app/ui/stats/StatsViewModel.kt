@@ -44,6 +44,11 @@ class StatsViewModel @Inject constructor(
         loadStats()
     }
 
+    /** 每次进入统计页时调用，刷新活跃度等数据（ViewModel 被 tab 复用，init 不会重跑）。 */
+    fun refresh() {
+        loadStats()
+    }
+
     private fun loadStats() {
         viewModelScope.launch {
             try {
