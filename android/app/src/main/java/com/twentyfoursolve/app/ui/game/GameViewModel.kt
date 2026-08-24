@@ -49,6 +49,7 @@ class GameViewModel @Inject constructor(
     private var totalGameTime = 120 // seconds
     private var currentIsPractice = false
     private var allowUnsolvable = true
+    private var cachedStreak = 0
 
     init {
         viewModelScope.launch {
@@ -86,7 +87,15 @@ class GameViewModel @Inject constructor(
         )
 
         if (!isPractice) {
+            refreshStreak()
             startTimer()
+        }
+    }
+
+    /** 预取当前连胜（缓存字段，供成功计分同步使用，避免异步竞态）。 */
+    private fun refreshStreak() {
+        viewModelScope.launch {
+            cachedStreak = gameRepository.getCurrentStreak()
         }
     }
 
@@ -268,31 +277,26 @@ class GameViewModel @Inject constructor(
             selectedCardIndices = emptySet(),
             currentOperator = null,
             history = newHistory,
-            score = current.score,
+            score = if (isSuccess) {
+                // 同步计分：难度系数 + 时间奖励 + 步数奖励 + 连胜加成（连胜用缓存值，无异步竞态）
+                computeFinalScore(
+                    difficulty = current.difficulty,
+                    timeRemaining = current.timeRemaining,
+                    mergeSteps = current.history.size + 1,
+                    streak = cachedStreak
+                )
+            } else {
+                current.score
+            },
             isGameOver = isGameOver,
             isSuccess = isSuccess
         )
 
         if (isGameOver) {
             timerJob?.cancel()
-            if (isSuccess) {
-                // 挑战模式计分：难度系数 + 时间奖励 + 步数奖励 + 连胜加成（异步查询连胜）
-                viewModelScope.launch {
-                    val streak = if (currentIsPractice) 0 else gameRepository.getCurrentStreak()
-                    val finalScore = computeFinalScore(
-                        difficulty = current.difficulty,
-                        timeRemaining = _state.value.timeRemaining,
-                        mergeSteps = current.history.size + 1,
-                        streak = streak
-                    )
-                    _state.value = _state.value.copy(score = finalScore)
-                    soundManager.play(SoundType.SUCCESS)
-                    saveGameRecord()
-                }
-            } else {
-                soundManager.play(SoundType.FAIL)
-                saveGameRecord()
-            }
+            if (isSuccess) soundManager.play(SoundType.SUCCESS)
+            else soundManager.play(SoundType.FAIL)
+            saveGameRecord()
         }
     }
 
