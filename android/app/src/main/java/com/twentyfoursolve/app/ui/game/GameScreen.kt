@@ -616,7 +616,7 @@ private fun ResultModal(
                 modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Result icon：成功用 Congratulations 图标，失败保留 ✕
+                // Result icon：成功用 Congratulations 图标，失败用 failure 图标
                 if (isSuccess) {
                     Image(
                         painter = painterResource(R.drawable.congratulations),
@@ -626,22 +626,13 @@ private fun ResultModal(
                             .clip(CircleShape)
                     )
                 } else {
-                    Surface(
-                        modifier = Modifier.size(120.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.errorContainer
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "✕",
-                                style = MaterialTheme.typography.displayLarge.copy(
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = 64.sp
-                                ),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+                    Image(
+                        painter = painterResource(R.drawable.failure),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
