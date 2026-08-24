@@ -94,7 +94,7 @@ fun NumberCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             // Top-left corner（仅花色，不显示数字）
@@ -104,7 +104,7 @@ fun NumberCard(
             ) {
                 Text(
                     text = suitIcon,
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     )
                 )
@@ -151,12 +151,12 @@ fun NumberCard(
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Black,
-                        fontSize = 56.sp,
-                        lineHeight = 64.sp,
+                        fontSize = 40.sp,
+                        lineHeight = 48.sp,
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     ),
                     textAlign = TextAlign.Center,
-                    // 强制单行：两位数（如 10）在窄卡片中换行会被误看成 1
+                    // 强制单行 + 自适应字号：两位数（如 10）完整显示且不与角标重叠
                     maxLines = 1,
                     softWrap = false
                 )
@@ -169,7 +169,7 @@ fun NumberCard(
             ) {
                 Text(
                     text = suitIcon,
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         color = if (isUsed) suitColor.copy(alpha = 0.3f) else suitColor
                     )
                 )
