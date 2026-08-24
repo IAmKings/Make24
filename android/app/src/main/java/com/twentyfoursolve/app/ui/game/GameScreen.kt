@@ -83,6 +83,7 @@ fun GameScreen(
     val state by viewModel.state.collectAsState()
     val strings = LocalStringProvider.current
     var showExitDialog by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     // 系统返回键：游戏进行中先弹确认，防止误触丢失进度（确认后由 onExit 退出）
     BackHandler { showExitDialog = true }
@@ -197,7 +198,7 @@ fun GameScreen(
                 text = strings["reset"] ?: "Reset",
                 icon = Icons.Filled.Refresh,
                 enabled = true,
-                onClick = { viewModel.onReset() },
+                onClick = { showResetDialog = true },
                 modifier = Modifier.weight(1f),
                 isError = true
             )
@@ -303,6 +304,33 @@ fun GameScreen(
             confirmButton = {
                 TextButton(onClick = { viewModel.clearMergeRejected() }) {
                     Text(strings["gotIt"] ?: "Got It")
+                }
+            }
+        )
+    }
+
+    // 重置确认（防止误触打断连胜/清空分数）
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text(strings["resetConfirmTitle"] ?: "Reset Round") },
+            text = {
+                Text(
+                    strings["resetConfirmText"]
+                        ?: "Reset will clear current score and break your win streak. Continue?"
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showResetDialog = false
+                    viewModel.onReset()
+                }) {
+                    Text(strings["reset"] ?: "Reset")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text(strings["cancel"] ?: "Cancel")
                 }
             }
         )
