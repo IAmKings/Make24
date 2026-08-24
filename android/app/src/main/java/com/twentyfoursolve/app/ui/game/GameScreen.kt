@@ -215,7 +215,7 @@ fun GameScreen(
         ResultModal(
             isSuccess = state.isSuccess,
             timeTaken = if (isPractice) 0 else (120 - state.timeRemaining),
-            score = if (state.isSuccess) 1250 else 0,
+            score = state.score,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
             strings = strings,
@@ -681,7 +681,7 @@ private fun ResultModal(
                     StatCard(
                         icon = Icons.Filled.Star,
                         label = strings["scoreLabel"] ?: "Score",
-                        value = if (isSuccess) "+1250" else "0",
+                        value = if (isSuccess) "+$score" else "0",
                         modifier = Modifier.weight(1f)
                     )
                 }

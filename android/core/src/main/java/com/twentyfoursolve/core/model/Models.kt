@@ -50,10 +50,10 @@ enum class Operator(val symbol: String) {
  * 统一难度阶梯：三档按数字范围递增（简单/中等/困难），难度即数值范围，
  * 不再单独提供"目标数值集合"维度，避免两个选择语义重复。
  */
-enum class Difficulty(val range: IntRange, val label: String) {
-    EASY(1..6, "Easy"),
-    MEDIUM(1..10, "Medium"),
-    HARD(1..13, "Hard");
+enum class Difficulty(val range: IntRange, val label: String, val multiplier: Double) {
+    EASY(1..6, "Easy", 1.0),
+    MEDIUM(1..10, "Medium", 1.5),
+    HARD(1..13, "Hard", 2.0);
 
     companion object {
         fun fromName(name: String): Difficulty = when (name.lowercase()) {

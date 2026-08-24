@@ -22,6 +22,7 @@ import com.twentyfoursolve.data.repository.GameRepository
 import com.twentyfoursolve.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -266,17 +267,50 @@ class GameViewModel @Inject constructor(
             selectedCardIndices = emptySet(),
             currentOperator = null,
             history = newHistory,
-            score = if (isSuccess) current.score + 1250 else current.score,
+            score = current.score,
             isGameOver = isGameOver,
             isSuccess = isSuccess
         )
 
         if (isGameOver) {
             timerJob?.cancel()
-            if (isSuccess) soundManager.play(SoundType.SUCCESS)
-            else soundManager.play(SoundType.FAIL)
-            saveGameRecord()
+            if (isSuccess) {
+                // 挑战模式计分：难度系数 + 时间奖励 + 步数奖励 + 连胜加成（异步查询连胜）
+                viewModelScope.launch {
+                    val streak = if (currentIsPractice) 0 else gameRepository.getCurrentStreak()
+                    val finalScore = computeFinalScore(
+                        difficulty = current.difficulty,
+                        timeRemaining = _state.value.timeRemaining,
+                        mergeSteps = current.history.size + 1,
+                        streak = streak
+                    )
+                    _state.value = _state.value.copy(score = finalScore)
+                    soundManager.play(SoundType.SUCCESS)
+                    saveGameRecord()
+                }
+            } else {
+                soundManager.play(SoundType.FAIL)
+                saveGameRecord()
+            }
         }
+    }
+
+    /**
+     * 挑战模式计分：
+     * 总分 = (基础 1250 + 剩余秒数×5 + 步数奖励 + 连胜×100) × 难度系数
+     * 步数奖励：完美 3 步完成 +300，每多一步 -100（最低 0）；练习模式无时间/连胜奖励。
+     */
+    private fun computeFinalScore(
+        difficulty: Difficulty,
+        timeRemaining: Int,
+        mergeSteps: Int,
+        streak: Int
+    ): Int {
+        val timeBonus = if (currentIsPractice) 0 else timeRemaining.coerceAtLeast(0) * 5
+        val stepsBonus = maxOf(0, 300 - (mergeSteps - 3) * 100)
+        val streakBonus = if (currentIsPractice) 0 else streak * 100
+        val base = 1250 + timeBonus + stepsBonus + streakBonus
+        return (base * difficulty.multiplier).roundToInt()
     }
 
     fun onUndo() {
