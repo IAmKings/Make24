@@ -51,6 +51,8 @@
     <string name="medium_desc">混合运算，数字最高到 20。</string>
     <string name="hard">困难</string>
     <string name="hard_desc">涉及分数、大数字和复杂解法。</string>
+    <string name="extreme">超难</string>
+    <string name="extreme_desc">数字 1–13，只发窄解。每局都有解。限时 180 秒，系数 ×3。</string>
     <string name="target_set">目标数值</string>
     <string name="start_practice">开始练习</string>
     <string name="selected">已选择</string>

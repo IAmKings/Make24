@@ -15,6 +15,6 @@ data class GameRecordEntity(
     val isSuccess: Boolean,
     val score: Int,
     val timeTaken: Int, // seconds
-    val difficulty: String, // "easy", "medium", "hard"
+    val difficulty: String, // "easy", "medium", "hard", "extreme"
     val mode: String // "timed" or "practice"
 )

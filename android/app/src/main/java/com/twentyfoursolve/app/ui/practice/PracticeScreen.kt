@@ -112,6 +112,14 @@ fun PracticeScreen(
             isSelected = selectedDifficulty == "hard",
             onClick = { selectedDifficulty = "hard" }
         )
+        DifficultyOption(
+            title = strings["extreme"] ?: "Extreme",
+            description = strings["extremeDesc"]
+                ?: "Numbers 1–13 with only narrow solutions. Always solvable. 180 seconds, ×3.",
+            icon = "\u26A1",
+            isSelected = selectedDifficulty == "extreme",
+            onClick = { selectedDifficulty = "extreme" }
+        )
 
         // 为底部固定开始按钮预留空间
         Spacer(modifier = Modifier.height(88.dp))

@@ -6,6 +6,7 @@ import com.twentyfoursolve.app.audio.SoundManager
 import com.twentyfoursolve.app.audio.SoundType
 import com.twentyfoursolve.core.logic.createCards
 import com.twentyfoursolve.core.logic.evaluateEquation
+import com.twentyfoursolve.core.logic.firstSolutionStep
 import com.twentyfoursolve.core.logic.generatePuzzle
 import com.make24.solver.ExpressionStyle
 import com.make24.solver.SolveOptions
@@ -64,18 +65,21 @@ class GameViewModel @Inject constructor(
         currentIsPractice = isPractice
         timerJob?.cancel()
 
-        // 统一难度阶梯：普通局与练习局都由难度决定数字范围；
-        // 是否允许无解由设置配置（简单难度始终有解）
+        // 普通局与练习局都由难度决定数字范围。
+        // 简单、超难始终有解；中等/困难才受「允许无解题」开关影响。
         val puzzle = generatePuzzle(difficulty, allowUnsolvable)
+        val roundAllowsUnsolvable = allowUnsolvable && !difficulty.alwaysSolvable
+        val limit = difficulty.timeLimitSeconds
 
         val cards = createCards(puzzle)
-        totalGameTime = if (isPractice) Int.MAX_VALUE else 120
+        totalGameTime = if (isPractice) Int.MAX_VALUE else limit
 
         _state.value = GameState(
             cards = cards,
             difficulty = difficulty,
-            timeRemaining = if (isPractice) Int.MAX_VALUE else 120,
-            allowUnsolvable = allowUnsolvable,
+            timeLimit = limit,
+            timeRemaining = if (isPractice) Int.MAX_VALUE else limit,
+            allowUnsolvable = roundAllowsUnsolvable,
             initialPuzzle = puzzle,
             isGameOver = false,
             isSuccess = false,
@@ -378,23 +382,61 @@ class GameViewModel @Inject constructor(
         startNewGame(current.difficulty, currentIsPractice)
     }
 
-    /** 请求提示：按当前剩余牌数分派求解器；有解给解法，无解给"当前无解"回答，纯参考展示。 */
+    /**
+     * 请求提示：按当前剩余牌数分派求解器。
+     * 超难计时局只给出下一步合并，并且每局限扣一次 300 分和 15 秒。
+     * 练习局以及其余难度给出完整解法，不扣分。
+     */
     fun requestHint() {
-        val result = solveCurrentBoard(ExpressionStyle.COMPACT)
+        val current = _state.value
+        val stepHint = current.difficulty == Difficulty.EXTREME && !currentIsPractice
+        val result = solveCurrentBoard(
+            if (stepHint) ExpressionStyle.FULLY_PARENTHESIZED else ExpressionStyle.COMPACT
+        )
         when (result?.status) {
             SolveStatus.SOLVED -> {
-                _state.value = _state.value.copy(
-                    hint = result.expression,
-                    hintUnsolvable = false
-                )
+                if (stepHint) {
+                    val expression = result.expression
+                    if (expression == null) {
+                        _state.value = current.copy(hint = null, hintUnsolvable = false, hintIsStep = false)
+                        return
+                    }
+                    val charge = !current.extremeHintUsed
+                    _state.value = current.copy(
+                        hint = firstSolutionStep(expression),
+                        hintIsStep = true,
+                        hintPenaltyApplied = charge,
+                        extremeHintUsed = true,
+                        hintUnsolvable = false,
+                        score = if (charge) maxOf(0, current.score - 300) else current.score,
+                        timeRemaining = if (charge) maxOf(1, current.timeRemaining - 15) else current.timeRemaining
+                    )
+                } else {
+                    _state.value = current.copy(
+                        hint = result.expression,
+                        hintIsStep = false,
+                        hintPenaltyApplied = false,
+                        hintUnsolvable = false
+                    )
+                }
             }
             SolveStatus.UNSOLVABLE -> {
-                // 当前牌面无解也是提示的一种回答（不打断连胜、不重置）
-                _state.value = _state.value.copy(hint = null, hintUnsolvable = true)
+                // 当前牌面无解也是提示的一种回答（不打断连胜、不重置、不扣分）
+                _state.value = current.copy(
+                    hint = null,
+                    hintIsStep = false,
+                    hintPenaltyApplied = false,
+                    hintUnsolvable = true
+                )
             }
             else -> {
                 // 剩余 1 张等无提示场景
-                _state.value = _state.value.copy(hint = null, hintUnsolvable = false)
+                _state.value = current.copy(
+                    hint = null,
+                    hintIsStep = false,
+                    hintPenaltyApplied = false,
+                    hintUnsolvable = false
+                )
             }
         }
     }
@@ -451,7 +493,12 @@ class GameViewModel @Inject constructor(
     }
 
     fun clearHint() {
-        _state.value = _state.value.copy(hint = null, hintUnsolvable = false)
+        _state.value = _state.value.copy(
+            hint = null,
+            hintUnsolvable = false,
+            hintIsStep = false,
+            hintPenaltyApplied = false
+        )
     }
 
     fun clearSolvable() {

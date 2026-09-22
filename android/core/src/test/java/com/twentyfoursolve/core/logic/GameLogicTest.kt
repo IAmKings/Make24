@@ -138,6 +138,34 @@ class GameLogicTest {
         assertTrue(solve24(puzzle.map { it.toDouble() }))
     }
 
+    @Test
+    fun `extreme hand keeps narrow solvable deals and rejects obvious ones`() {
+        assertTrue(isExtremeHand(listOf(3, 3, 8, 8)))
+        assertTrue(isExtremeHand(listOf(1, 5, 5, 5)))
+        assertTrue(isExtremeHand(listOf(3, 3, 3, 3)))
+        assertFalse(isExtremeHand(listOf(1, 1, 1, 1)))
+        assertFalse(isExtremeHand(listOf(1, 2, 3, 4)))
+        assertFalse(isExtremeHand(listOf(8, 3, 1, 1)))
+        assertFalse(isExtremeHand(listOf(6, 4, 2, 2)))
+    }
+
+    @Test
+    fun `generatePuzzle extreme stays inside 1-13 and passes the narrow filter`() {
+        repeat(8) {
+            val puzzle = generatePuzzle(Difficulty.EXTREME, allowUnsolvable = true)
+            assertEquals(4, puzzle.size)
+            assertTrue(puzzle.all { it in 1..13 })
+            assertTrue(isExtremeHand(puzzle))
+        }
+    }
+
+    @Test
+    fun `firstSolutionStep names one leaf merge`() {
+        assertEquals("8 ÷ 3", firstSolutionStep("(8 / (3 - (8 / 3)))"))
+        assertEquals("3 × 3", firstSolutionStep("(((3 * 3) * 3) - 3)"))
+        assertEquals("8/3 × 1", firstSolutionStep("((8/3) * 1)"))
+    }
+
     // ─── getCardLabel ────────────────────────────────────────────────
 
     @Test

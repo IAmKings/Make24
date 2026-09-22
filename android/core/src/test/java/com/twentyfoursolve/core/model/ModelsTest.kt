@@ -28,6 +28,12 @@ class ModelsTest {
     }
 
     @Test
+    fun `Difficulty fromName extreme`() {
+        assertEquals(Difficulty.EXTREME, Difficulty.fromName("extreme"))
+        assertEquals(Difficulty.EXTREME, Difficulty.fromName("EXTREME"))
+    }
+
+    @Test
     fun `Difficulty fromName unknown defaults to medium`() {
         assertEquals(Difficulty.MEDIUM, Difficulty.fromName("unknown"))
     }
@@ -37,6 +43,11 @@ class ModelsTest {
         assertEquals(1..6, Difficulty.EASY.range)
         assertEquals(1..10, Difficulty.MEDIUM.range)
         assertEquals(1..13, Difficulty.HARD.range)
+        assertEquals(1..13, Difficulty.EXTREME.range)
+        assertEquals(3.0, Difficulty.EXTREME.multiplier)
+        assertEquals(180, Difficulty.EXTREME.timeLimitSeconds)
+        assertTrue(Difficulty.EXTREME.alwaysSolvable)
+        assertTrue(Difficulty.EASY.alwaysSolvable)
     }
 
 

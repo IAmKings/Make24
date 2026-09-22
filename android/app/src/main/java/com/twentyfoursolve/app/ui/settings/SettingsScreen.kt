@@ -96,11 +96,14 @@ fun SettingsScreen(
                     Difficulty.EASY -> strings["easy"] ?: "Easy"
                     Difficulty.MEDIUM -> strings["medium"] ?: "Medium"
                     Difficulty.HARD -> strings["hard"] ?: "Hard"
+                    Difficulty.EXTREME -> strings["extreme"] ?: "Extreme"
                 },
                 subtitle = when (difficulty) {
                     Difficulty.EASY -> strings["easyDesc"] ?: "Simple numbers (1–10), basic operations."
                     Difficulty.MEDIUM -> strings["mediumDesc"] ?: "Mixed operations, numbers up to 20."
                     Difficulty.HARD -> strings["hardDesc"] ?: "Fractions, large numbers, complex solves."
+                    Difficulty.EXTREME -> strings["extremeDesc"]
+                        ?: "Numbers 1–13 with only narrow solutions. Always solvable. 180 seconds, ×3."
                 },
                 isSelected = settings.difficultyPreference == difficulty,
                 onClick = { viewModel.updateDifficulty(difficulty) }

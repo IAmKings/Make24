@@ -47,18 +47,26 @@ enum class Operator(val symbol: String) {
 
 /**
  * Game difficulty levels.
- * 统一难度阶梯：三档按数字范围递增（简单/中等/困难），难度即数值范围，
- * 不再单独提供"目标数值集合"维度，避免两个选择语义重复。
+ * 简单 / 中等 / 困难按数字范围递增。超难仍用 1–13 牌面，但只发窄解。
  */
-enum class Difficulty(val range: IntRange, val label: String, val multiplier: Double) {
-    EASY(1..6, "Easy", 1.0),
+enum class Difficulty(
+    val range: IntRange,
+    val label: String,
+    val multiplier: Double,
+    val timeLimitSeconds: Int = 120,
+    /** 简单与超难始终发有解牌，不受「允许无解题」开关影响。 */
+    val alwaysSolvable: Boolean = false,
+) {
+    EASY(1..6, "Easy", 1.0, alwaysSolvable = true),
     MEDIUM(1..10, "Medium", 1.5),
-    HARD(1..13, "Hard", 2.0);
+    HARD(1..13, "Hard", 2.0),
+    EXTREME(1..13, "Extreme", 3.0, timeLimitSeconds = 180, alwaysSolvable = true);
 
     companion object {
         fun fromName(name: String): Difficulty = when (name.lowercase()) {
             "easy" -> EASY
             "hard" -> HARD
+            "extreme" -> EXTREME
             else -> MEDIUM
         }
     }
@@ -86,11 +94,19 @@ data class GameState(
     val score: Int = 0,
     val timeRemaining: Int = 120, // seconds
     val difficulty: Difficulty = Difficulty.MEDIUM,
+    /** 本局限时（秒）。练习模式不计时，结算用时仍读这个上限。 */
+    val timeLimit: Int = 120,
     val isGameOver: Boolean = false,
     val isSuccess: Boolean = false,
     val history: List<List<Card>> = emptyList(),
-    /** 提示：当前牌面的一个解法表达式（null 表示未请求提示）。 */
+    /** 提示：当前牌面的一个解法表达式，或超难计时局的第一步（null 表示未请求提示）。 */
     val hint: String? = null,
+    /** 超难计时局的提示只含一步合并，而不是整式。 */
+    val hintIsStep: Boolean = false,
+    /** 这次提示刚刚扣除了 300 分和 15 秒。 */
+    val hintPenaltyApplied: Boolean = false,
+    /** 本局超难提示已经扣过一次，再次打开不再扣。 */
+    val extremeHintUsed: Boolean = false,
     /** 可解性检查结果：null=未检查，true=有解，false=无解。 */
     val solvable: Boolean? = null,
     /** 简单难度下合并被拒绝（合并后剩余牌面无解）。 */
@@ -129,6 +145,6 @@ data class UserSettings(
     val soundEnabled: Boolean = true,
     val difficultyPreference: Difficulty = Difficulty.MEDIUM,
     val language: Language = Language.ZH,
-    /** 是否允许开局出现无解题（中高难度；简单难度始终无无解）。 */
+    /** 是否允许开局出现无解题（中等/困难；简单与超难始终有解）。 */
     val allowUnsolvable: Boolean = true
 )

@@ -62,13 +62,14 @@ fun solve24(numbers: List<Double>): Boolean {
  * Generate a puzzle.
  * @param difficulty Controls the range of random numbers（统一难度阶梯）
  * @param allowUnsolvable 是否允许无解题（中等/困难且开启时，随机发牌可能无解，贴近真实牌局；
- *                        简单难度与关闭该配置时，始终用精确 solver 校验保证有解）
+ *                        简单、超难，以及关闭该配置时，始终保证有解）
  * @return List of 4 integers
  */
 fun generatePuzzle(difficulty: Difficulty, allowUnsolvable: Boolean): List<Int> {
+    if (difficulty == Difficulty.EXTREME) return generateExtremePuzzle()
     val maxRange = difficulty.range.last
     // 简单难度始终可解；其他难度按配置决定是否校验
-    val mustBeSolvable = difficulty == Difficulty.EASY || !allowUnsolvable
+    val mustBeSolvable = difficulty.alwaysSolvable || !allowUnsolvable
     var attempts = 0
     while (attempts < 10000) {
         val nums = List(4) { Random.nextInt(1, maxRange + 1) }
@@ -81,6 +82,17 @@ fun generatePuzzle(difficulty: Difficulty, allowUnsolvable: Boolean): List<Int> 
     }
     // Fallback: return a known solvable puzzle (1, 2, 3, 4)
     return listOf(1, 2, 3, 4)
+}
+
+/** 超难：在 1–13 里拒绝采样，直到命中窄解。兜底用已知窄解 3,3,8,8。 */
+private fun generateExtremePuzzle(): List<Int> {
+    var attempts = 0
+    while (attempts < 10000) {
+        val nums = List(4) { Random.nextInt(1, 14) }
+        if (isExtremeHand(nums)) return nums
+        attempts++
+    }
+    return listOf(3, 3, 8, 8)
 }
 
 /**

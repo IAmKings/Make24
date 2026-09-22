@@ -56,6 +56,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -163,9 +164,9 @@ fun GameScreen(
             ActionButton(
                 text = strings["unsolvable"] ?: "No Solution",
                 icon = Icons.Filled.HelpOutline,
-                // 仅回答开局发牌是否无解：配置允许 + 非简单难度 + 尚未操作（未合并过）
+                // 仅回答开局发牌是否无解：配置允许 + 中等/困难 + 尚未操作（未合并过）
                 enabled = state.allowUnsolvable &&
-                    state.difficulty != Difficulty.EASY &&
+                    !state.difficulty.alwaysSolvable &&
                     state.history.isEmpty() &&
                     !state.isGameOver,
                 onClick = { viewModel.checkUnsolvable() },
@@ -215,7 +216,7 @@ fun GameScreen(
     ) {
         ResultModal(
             isSuccess = state.isSuccess,
-            timeTaken = if (isPractice) 0 else (120 - state.timeRemaining),
+            timeTaken = if (isPractice) 0 else (state.timeLimit - state.timeRemaining).coerceAtLeast(0),
             score = state.roundScore,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
@@ -230,10 +231,24 @@ fun GameScreen(
             onDismissRequest = { viewModel.clearHint() },
             title = { Text(strings["hint"] ?: "Hint") },
             text = {
-                Text(
-                    (strings["hintText"] ?: "Solution: %s").format(hint),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        if (state.hintIsStep) {
+                            (strings["hintStep"] ?: "Next: %s").format(hint)
+                        } else {
+                            (strings["hintText"] ?: "Solution: %s").format(hint)
+                        },
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    if (state.hintPenaltyApplied) {
+                        Text(
+                            strings["hintStepPenalty"]
+                                ?: "−300 points and −15 seconds.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearHint() }) {
@@ -395,7 +410,7 @@ private fun GameHud(
             // 返回按钮与剩余时间之间的间隔
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Time remaining（占据中间弹性空间）
+            // 剩余时间与得分各占一半，避免五位数分数把倒计时挤到换行
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = timeRemainingLabel.uppercase(),
@@ -404,7 +419,10 @@ private fun GameHud(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 2.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -420,9 +438,12 @@ private fun GameHud(
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Black,
-                            letterSpacing = (-1).sp
+                            letterSpacing = (-1).sp,
+                            fontFeatureSettings = "tnum"
                         ),
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
             }
@@ -430,7 +451,9 @@ private fun GameHud(
             // Score（右侧留出边距，不紧贴 HUD 边缘）
             Column(
                 horizontalAlignment = Alignment.End,
-                modifier = Modifier.padding(start = 12.dp, end = 4.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp, end = 4.dp)
             ) {
                 Text(
                     text = scoreLabel.uppercase(),
@@ -439,7 +462,10 @@ private fun GameHud(
                         fontWeight = FontWeight.Black,
                         letterSpacing = 2.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -448,9 +474,12 @@ private fun GameHud(
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Black,
-                            letterSpacing = (-1).sp
+                            letterSpacing = (-1).sp,
+                            fontFeatureSettings = "tnum"
                         ),
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
+                        maxLines = 1,
+                        softWrap = false
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(

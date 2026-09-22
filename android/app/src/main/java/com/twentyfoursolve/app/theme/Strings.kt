@@ -93,6 +93,10 @@ private val englishStrings = mapOf(
     "mediumDesc" to "Numbers 1–10 — trickier combinations and order.",
     "hard" to "Hard",
     "hardDesc" to "Numbers 1–13 (classic deck) — complex solves, often with division.",
+    "extreme" to "Extreme",
+    "extremeDesc" to "Numbers 1–13 with only narrow solutions. Always solvable. 180 seconds, ×3.",
+    "hintStep" to "Next: %s",
+    "hintStepPenalty" to "−300 points and −15 seconds.",
     "targetSet" to "Target Set",
     "startPractice" to "Start Practice",
     "selected" to "Selected",
@@ -103,7 +107,7 @@ private val englishStrings = mapOf(
     "soundEnabledDesc" to "Play sound effects during gameplay",
     "difficultyPreference" to "Default Difficulty",
     "allowUnsolvable" to "Allow Unsolvable Hands",
-    "allowUnsolvableDesc" to "Medium & Hard may deal unsolvable hands, like a real deck. Easy is always solvable.",
+    "allowUnsolvableDesc" to "Medium and Hard may deal unsolvable hands, like a real deck. Easy and Extreme are always solvable.",
     "languageLabel" to "Language",
     "noData" to "No games played yet. Start playing to see your stats!"
 )
@@ -183,6 +187,10 @@ private val chineseStrings = mapOf(
     "mediumDesc" to "数字 1-10，需要更巧妙的组合与运算顺序。",
     "hard" to "困难",
     "hardDesc" to "数字 1-13（经典牌面），解法复杂，常需除法与分数策略。",
+    "extreme" to "超难",
+    "extremeDesc" to "数字 1–13，只发窄解。每局都有解。限时 180 秒，系数 ×3。",
+    "hintStep" to "先算：%s",
+    "hintStepPenalty" to "已扣除 300 分和 15 秒。",
     "targetSet" to "目标数值",
     "startPractice" to "开始练习",
     "selected" to "已选择",
@@ -193,7 +201,7 @@ private val chineseStrings = mapOf(
     "soundEnabledDesc" to "游戏过程中播放音效",
     "difficultyPreference" to "默认难度",
     "allowUnsolvable" to "允许无解题",
-    "allowUnsolvableDesc" to "中等/困难可能开出无解牌局，更贴近真实牌局。简单始终可解。",
+    "allowUnsolvableDesc" to "中等/困难可能开出无解牌局，更贴近真实牌局。简单和超难始终可解。",
     "languageLabel" to "语言",
     "noData" to "还没有游戏记录。开始游戏后可查看统计！"
 )
