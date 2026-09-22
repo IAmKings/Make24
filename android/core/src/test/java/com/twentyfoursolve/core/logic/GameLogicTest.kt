@@ -1,6 +1,7 @@
 package com.twentyfoursolve.core.logic
 
 import com.twentyfoursolve.core.model.Difficulty
+import com.twentyfoursolve.core.model.Operator
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -157,6 +158,25 @@ class GameLogicTest {
             assertTrue(puzzle.all { it in 1..13 })
             assertTrue(isExtremeHand(puzzle))
         }
+    }
+
+    @Test
+    fun `player formula keeps merge order and adds parentheses only when needed`() {
+        val eightDivThree = formatPlayerFormula("8", null, Operator.DIVIDE, "3", null)
+        assertEquals("8 ÷ 3", eightDivThree)
+        val threeMinus = formatPlayerFormula("3", null, Operator.MINUS, eightDivThree, Operator.DIVIDE)
+        assertEquals("3 − 8 ÷ 3", threeMinus)
+        val solved = formatPlayerFormula("8", null, Operator.DIVIDE, threeMinus, Operator.MINUS)
+        assertEquals("8 ÷ (3 − 8 ÷ 3)", solved)
+
+        val product = formatPlayerFormula("3", null, Operator.MULTIPLY, "3", null)
+        val triple = formatPlayerFormula(product, Operator.MULTIPLY, Operator.MULTIPLY, "3", null)
+        val classic = formatPlayerFormula(triple, Operator.MULTIPLY, Operator.MINUS, "3", null)
+        assertEquals("3 × 3 × 3 − 3", classic)
+
+        val diff = formatPlayerFormula("8", null, Operator.MINUS, "3", null)
+        assertEquals("(8 − 3) × 2", formatPlayerFormula(diff, Operator.MINUS, Operator.MULTIPLY, "2", null))
+        assertEquals("8 − (3 − 1)", formatPlayerFormula("8", null, Operator.MINUS, "3 − 1", Operator.MINUS))
     }
 
     @Test

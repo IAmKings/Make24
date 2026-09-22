@@ -7,6 +7,7 @@ import com.twentyfoursolve.app.audio.SoundType
 import com.twentyfoursolve.core.logic.createCards
 import com.twentyfoursolve.core.logic.evaluateEquation
 import com.twentyfoursolve.core.logic.firstSolutionStep
+import com.twentyfoursolve.core.logic.formatPlayerFormula
 import com.twentyfoursolve.core.logic.generatePuzzle
 import com.make24.solver.ExpressionStyle
 import com.make24.solver.SolveOptions
@@ -260,6 +261,13 @@ class GameViewModel @Inject constructor(
 
         // 结果标签：整数直接显示，分数显示 n/d
         val resultLabel = if (rd == 1L) rn.toString() else "$rn/$rd"
+        val resultFormula = formatPlayerFormula(
+            left = firstCard.formula.ifEmpty { n1.toString() },
+            leftOp = firstCard.formulaOp,
+            op = operator,
+            right = secondCard.formula.ifEmpty { n2.toString() },
+            rightOp = secondCard.formulaOp
+        )
 
         val newCards = current.cards.toMutableList()
         newCards[firstIdx] = firstCard.copy(isUsed = true, id = "used-${System.currentTimeMillis()}")
@@ -268,7 +276,9 @@ class GameViewModel @Inject constructor(
             value = result,
             label = resultLabel,
             numerator = rn,
-            denominator = rd
+            denominator = rd,
+            formula = resultFormula,
+            formulaOp = operator
         )
 
         val remainingCards = newCards.filter { !it.isUsed }

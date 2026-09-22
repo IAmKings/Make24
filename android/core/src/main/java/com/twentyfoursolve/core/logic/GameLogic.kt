@@ -4,6 +4,7 @@ import com.twentyfoursolve.core.model.Card
 import com.make24.solver.SolveStatus
 import com.make24.solver.TwentyFourSolver
 import com.twentyfoursolve.core.model.Difficulty
+import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.core.model.Suit
 import kotlin.math.abs
 import kotlin.random.Random
@@ -128,9 +129,44 @@ fun createCards(numbers: List<Int>): List<Card> {
             id = "card-$idx-${System.currentTimeMillis()}",
             value = value.toDouble(),
             label = getCardLabel(value.toDouble()),
-            suit = SUITS[Random.nextInt(SUITS.size)]
+            suit = SUITS[Random.nextInt(SUITS.size)],
+            formula = value.toString()
         )
     }
+}
+
+/**
+ * 把玩家这一步的两个算式按选择顺序合成一条式子。
+ * 只在会改变运算顺序时加括号，减号和除号保留玩家选的左右顺序。
+ */
+fun formatPlayerFormula(
+    left: String,
+    leftOp: Operator?,
+    op: Operator,
+    right: String,
+    rightOp: Operator?
+): String {
+    val leftText = parenthesize(left, leftOp, op, rightSide = false)
+    val rightText = parenthesize(right, rightOp, op, rightSide = true)
+    return "$leftText ${displayOperator(op)} $rightText"
+}
+
+private fun precedence(op: Operator): Int = when (op) {
+    Operator.PLUS, Operator.MINUS -> 1
+    Operator.MULTIPLY, Operator.DIVIDE -> 2
+}
+
+private fun parenthesize(text: String, childOp: Operator?, parent: Operator, rightSide: Boolean): String {
+    if (childOp == null) return text
+    val childRank = precedence(childOp)
+    val parentRank = precedence(parent)
+    val needsParen = childRank < parentRank || (childRank == parentRank && rightSide)
+    return if (needsParen) "($text)" else text
+}
+
+private fun displayOperator(op: Operator): String = when (op) {
+    Operator.MINUS -> "−"
+    else -> op.symbol
 }
 
 /**

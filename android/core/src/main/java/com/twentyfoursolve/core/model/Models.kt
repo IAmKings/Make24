@@ -23,6 +23,10 @@ data class Card(
     // 精确分数表示：合并结果以此为准（value 仅用于兼容显示）
     val numerator: Long = value.toLong(),
     val denominator: Long = 1L,
+    /** 玩家实际合并出的算式。初始牌是数字本身，合并后带上运算符。 */
+    val formula: String = "",
+    /** 算式最外层运算符。初始牌为 null，用来决定下一层要不要加括号。 */
+    val formulaOp: Operator? = null,
     // Extension fields reserved for future card role/skin system
     val characterId: String? = null,
     val skinId: String? = null

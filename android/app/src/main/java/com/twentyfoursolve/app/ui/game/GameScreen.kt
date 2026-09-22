@@ -218,6 +218,7 @@ fun GameScreen(
             isSuccess = state.isSuccess,
             timeTaken = if (isPractice) 0 else (state.timeLimit - state.timeRemaining).coerceAtLeast(0),
             score = state.roundScore,
+            formula = if (state.isSuccess) state.cards.firstOrNull { !it.isUsed }?.formula else null,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
             strings = strings,
@@ -657,6 +658,7 @@ private fun ResultModal(
     isSuccess: Boolean,
     timeTaken: Int,
     score: Int,
+    formula: String?,
     onNextRound: () -> Unit,
     onExit: () -> Unit,
     strings: Map<String, String>,
@@ -720,8 +722,33 @@ private fun ResultModal(
                 Text(
                     text = strings[if (isSuccess) "masteredLevel" else "failedLevel"] ?: "",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
+
+                if (isSuccess && !formula.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = strings["yourSolution"] ?: "Your solution",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = formula,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Black
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
