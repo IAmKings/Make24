@@ -8,6 +8,7 @@ object Routes {
     const val GAME = "game/{difficulty}"
     const val PRACTICE_CONFIG = "practice_config"
     const val GAME_PRACTICE = "game_practice/{difficulty}"
+    const val GAME_DAILY = "game_daily"
     const val RULES = "rules"
     const val STATS = "stats"
     const val SETTINGS = "settings"

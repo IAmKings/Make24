@@ -114,6 +114,10 @@ data class GameState(
     val timeLimit: Int = 120,
     val isGameOver: Boolean = false,
     val isSuccess: Boolean = false,
+    /** 本局胜利来自正确判断开局无解，而不是把牌算成 24。 */
+    val wonByUnsolvable: Boolean = false,
+    /** 每日一题：固定题目，成绩单独记录。 */
+    val isDaily: Boolean = false,
     val history: List<List<Card>> = emptyList(),
     /** 提示：完整解法，或计时中等及以上的下一步（null 表示未请求提示）。 */
     val hint: String? = null,

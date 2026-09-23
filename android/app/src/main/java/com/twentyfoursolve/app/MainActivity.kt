@@ -68,8 +68,10 @@ fun Solve24NavHost(defaultDifficulty: Difficulty) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    // 游戏页（普通局/练习局）隐藏底部导航栏
-    val showBottomBar = currentRoute != Routes.GAME && currentRoute != Routes.GAME_PRACTICE
+    // 对局中隐藏底部导航，避免结算弹窗被底栏挤掉分享按钮
+    val showBottomBar = currentRoute != Routes.GAME &&
+        currentRoute != Routes.GAME_PRACTICE &&
+        currentRoute != Routes.GAME_DAILY
 
     Scaffold(
         bottomBar = {
@@ -93,6 +95,7 @@ fun Solve24NavHost(defaultDifficulty: Difficulty) {
                     onStartGame = {
                         navController.navigate(Routes.game(defaultDifficulty.name.lowercase()))
                     },
+                    onDaily = { navController.navigate(Routes.GAME_DAILY) },
                     onPracticeMode = { navigateToTab(navController, Routes.PRACTICE_CONFIG) },
                     onNavigate = { tab ->
                         when (tab) {
@@ -113,6 +116,15 @@ fun Solve24NavHost(defaultDifficulty: Difficulty) {
                 GameScreen(
                     difficulty = difficulty,
                     isPractice = false,
+                    onExit = { navController.popBackStack() }
+                )
+            }
+
+            composable(Routes.GAME_DAILY) {
+                GameScreen(
+                    difficulty = "hard",
+                    isPractice = false,
+                    isDaily = true,
                     onExit = { navController.popBackStack() }
                 )
             }

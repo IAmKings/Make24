@@ -26,7 +26,7 @@ interface GameRecordDao {
     @Query("SELECT AVG(CAST(timeTaken AS REAL)) FROM game_records WHERE isSuccess = 1 AND mode = 'timed'")
     suspend fun getAverageTime(): Double?
 
-    @Query("SELECT * FROM game_records WHERE isSuccess = 1 ORDER BY score DESC LIMIT :limit")
+    @Query("SELECT * FROM game_records WHERE isSuccess = 1 AND mode = 'timed' ORDER BY score DESC LIMIT :limit")
     suspend fun getTopSolves(limit: Int): List<GameRecordEntity>
 
     @Query("""

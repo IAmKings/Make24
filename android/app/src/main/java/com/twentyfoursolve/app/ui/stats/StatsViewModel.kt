@@ -3,7 +3,9 @@ package com.twentyfoursolve.app.ui.stats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twentyfoursolve.core.model.Difficulty
+import com.twentyfoursolve.data.repository.DailyRepository
 import com.twentyfoursolve.data.repository.GameRepository
+import java.time.LocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,8 @@ data class StatsUiModel(
     val topSolves: List<TopSolve> = emptyList(),
     val dailyWins: List<DailyWin> = emptyList(),
     val byDifficulty: List<DifficultyStat> = emptyList(),
+    val dailyStreak: Int = 0,
+    val dailyBest: Int? = null,
 ) {
     data class DifficultyStat(
         val difficulty: Difficulty,
@@ -29,6 +33,7 @@ data class StatsUiModel(
     data class TopSolve(
         val rank: Int,
         val score: Int,
+        val difficulty: Difficulty,
         val timeTaken: Int,
         val date: Long,
         val isBest: Boolean = false
@@ -42,7 +47,8 @@ data class StatsUiModel(
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val dailyRepository: DailyRepository,
 ) : ViewModel() {
 
     private val _stats = MutableStateFlow(StatsUiModel())
@@ -66,6 +72,9 @@ class StatsViewModel @Inject constructor(
                 val streak = gameRepository.getCurrentStreak()
                 val topSolves = gameRepository.getTopSolves(3)
                 val byDifficulty = gameRepository.getDifficultyStats()
+                val today = LocalDate.now().toEpochDay()
+                val dailyBest = dailyRepository.get(today)?.score
+                val dailyStreak = dailyRepository.streakAsOf(today)
 
                 val sevenDaysAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000L
                 val dailyActivity = gameRepository.getDailyActivity(sevenDaysAgo)
@@ -79,6 +88,7 @@ class StatsViewModel @Inject constructor(
                         StatsUiModel.TopSolve(
                             rank = idx + 1,
                             score = record.score,
+                            difficulty = Difficulty.fromName(record.difficulty),
                             timeTaken = record.timeTaken,
                             date = record.date,
                             isBest = idx == 0
@@ -97,6 +107,8 @@ class StatsViewModel @Inject constructor(
                             avgTimeSeconds = row.avgTimeSeconds,
                         )
                     },
+                    dailyStreak = dailyStreak,
+                    dailyBest = dailyBest,
                 )
             } catch (_: Exception) {
                 // Keep default empty state

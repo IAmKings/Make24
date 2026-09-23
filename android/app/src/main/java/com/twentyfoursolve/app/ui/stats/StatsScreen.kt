@@ -69,9 +69,8 @@ fun StatsScreen(
         verticalArrangement = Arrangement.spacedBy(Spacing.lg)
     ) {
         if (stats.totalGames == 0) {
-            // Empty state
             Box(
-                modifier = Modifier.fillMaxWidth().height(400.dp),
+                modifier = Modifier.fillMaxWidth().height(240.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -80,6 +79,12 @@ fun StatsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            DifficultyStatRow(
+                name = strings["dailyStreak"] ?: "Daily streak",
+                winRate = if (stats.dailyStreak > 0) stats.dailyStreak.toString() else "—",
+                avgTime = stats.dailyBest?.let { (strings["scorePoints"] ?: "%d").format(it) } ?: "—",
+                games = strings["dailyToday"] ?: "Today's best",
+            )
             return@Column
         }
 
@@ -250,6 +255,12 @@ fun StatsScreen(
                 games = (strings["gamesCount"] ?: "%d games").format(row.games),
             )
         }
+        DifficultyStatRow(
+            name = strings["dailyStreak"] ?: "Daily streak",
+            winRate = if (stats.dailyStreak > 0) stats.dailyStreak.toString() else "—",
+            avgTime = stats.dailyBest?.let { (strings["scorePoints"] ?: "%d").format(it) } ?: "—",
+            games = strings["dailyToday"] ?: "Today's best",
+        )
 
         // Activity placeholder (simplified bar chart)
         ActivityChart(
@@ -275,7 +286,7 @@ fun StatsScreen(
             stats.topSolves.take(3).forEachIndexed { idx, record ->
                 TopSolveRow(
                     rank = idx + 1,
-                    title = "${strings["level_format"]?.format(record.score) ?: "Level ${record.score}"}",
+                    title = topSolveTitle(strings, record.difficulty, record.score),
                     date = formatTimestamp(record.date),
                     time = "${record.timeTaken}s",
                     isBest = idx == 0
@@ -326,6 +337,16 @@ private fun DifficultyStatRow(
             )
         }
     }
+}
+
+private fun topSolveTitle(
+    strings: Map<String, String>,
+    difficulty: com.twentyfoursolve.core.model.Difficulty,
+    score: Int,
+): String {
+    val name = difficultyLabel(strings, difficulty)
+    val points = (strings["scorePoints"] ?: "%d").format(score)
+    return "$name · $points"
 }
 
 private fun difficultyLabel(

@@ -6,8 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.twentyfoursolve.data.local.AppDatabase
+import com.twentyfoursolve.data.local.MIGRATION_1_2
+import com.twentyfoursolve.data.local.dao.DailyResultDao
 import com.twentyfoursolve.data.local.dao.GameRecordDao
+import com.twentyfoursolve.data.repository.DailyRepository
 import com.twentyfoursolve.data.repository.GameRepository
+import com.twentyfoursolve.data.repository.LocalDailyRepository
 import com.twentyfoursolve.data.repository.LocalGameRepository
 import com.twentyfoursolve.data.repository.SettingsRepository
 import dagger.Module
@@ -30,12 +34,23 @@ object DataModule {
             context,
             AppDatabase::class.java,
             "solve24_database"
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
     }
 
     @Provides
     fun provideGameRecordDao(database: AppDatabase): GameRecordDao {
         return database.gameRecordDao()
+    }
+
+    @Provides
+    fun provideDailyResultDao(database: AppDatabase): DailyResultDao {
+        return database.dailyResultDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDailyRepository(dao: DailyResultDao): DailyRepository {
+        return LocalDailyRepository(dao)
     }
 
     @Provides

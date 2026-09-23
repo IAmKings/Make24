@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.twentyfoursolve.app.audio.SoundManager
 import com.twentyfoursolve.app.audio.SoundType
 import com.twentyfoursolve.core.logic.createCards
+import com.twentyfoursolve.core.logic.dailyPuzzle
 import com.twentyfoursolve.core.logic.evaluateEquation
 import com.twentyfoursolve.core.logic.firstSolutionStep
 import com.twentyfoursolve.core.logic.formatPlayerFormula
@@ -20,8 +21,10 @@ import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.GameRecord
 import com.twentyfoursolve.core.model.GameState
 import com.twentyfoursolve.core.model.Operator
+import com.twentyfoursolve.data.repository.DailyRepository
 import com.twentyfoursolve.data.repository.GameRepository
 import com.twentyfoursolve.data.repository.SettingsRepository
+import java.time.LocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -40,6 +43,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val dailyRepository: DailyRepository,
     private val settingsRepository: SettingsRepository,
     private val soundManager: SoundManager
 ) : ViewModel() {
@@ -50,6 +54,8 @@ class GameViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var totalGameTime = 120 // seconds
     private var currentIsPractice = false
+    private var currentIsDaily = false
+    private var dailyEpochDay = 0L
     private var allowUnsolvable = true
     private var cachedStreak = 0
 
@@ -62,14 +68,40 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    fun startDailyGame() {
+        currentIsDaily = true
+        currentIsPractice = false
+        dailyEpochDay = LocalDate.now().toEpochDay()
+        startRound(
+            difficulty = Difficulty.HARD,
+            puzzle = dailyPuzzle(dailyEpochDay),
+            isPractice = false,
+            allowUnsolvableHands = false,
+            carryScore = false,
+        )
+    }
+
     fun startNewGame(difficulty: Difficulty, isPractice: Boolean, carryScore: Boolean = false) {
+        currentIsDaily = false
         currentIsPractice = isPractice
+        startRound(
+            difficulty = difficulty,
+            puzzle = generatePuzzle(difficulty, allowUnsolvable),
+            isPractice = isPractice,
+            allowUnsolvableHands = allowUnsolvable && !difficulty.alwaysSolvable,
+            carryScore = carryScore,
+        )
+    }
+
+    private fun startRound(
+        difficulty: Difficulty,
+        puzzle: List<Int>,
+        isPractice: Boolean,
+        allowUnsolvableHands: Boolean,
+        carryScore: Boolean,
+    ) {
         timerJob?.cancel()
 
-        // 普通局与练习局都由难度决定数字范围。
-        // 简单、超难始终有解；中等/困难才受「允许无解题」开关影响。
-        val puzzle = generatePuzzle(difficulty, allowUnsolvable)
-        val roundAllowsUnsolvable = allowUnsolvable && !difficulty.alwaysSolvable
         val limit = difficulty.timeLimitSeconds
 
         val cards = createCards(puzzle)
@@ -80,7 +112,8 @@ class GameViewModel @Inject constructor(
             difficulty = difficulty,
             timeLimit = limit,
             timeRemaining = if (isPractice) Int.MAX_VALUE else limit,
-            allowUnsolvable = roundAllowsUnsolvable,
+            allowUnsolvable = allowUnsolvableHands,
+            isDaily = currentIsDaily,
             initialPuzzle = puzzle,
             isGameOver = false,
             isSuccess = false,
@@ -294,7 +327,7 @@ class GameViewModel @Inject constructor(
                 difficulty = current.difficulty,
                 timeRemaining = current.timeRemaining,
                 mergeSteps = current.history.size + 1,
-                streak = cachedStreak
+                streak = if (currentIsDaily) 0 else cachedStreak
             )
         } else {
             0
@@ -324,6 +357,12 @@ class GameViewModel @Inject constructor(
             timerJob?.cancel()
             if (isSuccess) soundManager.play(SoundType.SUCCESS)
             else soundManager.play(SoundType.FAIL)
+            if (isSuccess && currentIsDaily) {
+                val timeTaken = (totalGameTime - current.timeRemaining).coerceAtLeast(0)
+                viewModelScope.launch {
+                    dailyRepository.saveIfBetter(dailyEpochDay, roundScore, timeTaken)
+                }
+            }
             saveGameRecord()
         }
     }
@@ -364,6 +403,10 @@ class GameViewModel @Inject constructor(
     }
 
     fun onReset() {
+        if (currentIsDaily) {
+            startDailyGame()
+            return
+        }
         abandonToNewRound()
     }
 
@@ -578,28 +621,42 @@ class GameViewModel @Inject constructor(
      */
     fun confirmUnsolvableWin() {
         val current = _state.value
+        timerJob?.cancel()
         if (currentIsPractice) {
-            startNewGame(current.difficulty, true, carryScore = true)
+            _state.value = current.copy(
+                isGameOver = true,
+                isSuccess = true,
+                wonByUnsolvable = true,
+                solvable = null,
+                unsolvablePenalty = false,
+                mergeDeadEnd = false
+            )
+            soundManager.play(SoundType.SUCCESS)
             return
         }
         viewModelScope.launch {
             val streak = gameRepository.getCurrentStreak()
             val reward = ((500 + streak * 100) * current.difficulty.multiplier).roundToInt()
+            val roundTime = (totalGameTime - current.timeRemaining).coerceAtLeast(0)
             _state.value = current.copy(
                 score = current.score + reward,
                 roundScore = reward,
+                accumulatedTime = current.accumulatedTime + roundTime,
+                isGameOver = true,
                 isSuccess = true,
+                wonByUnsolvable = true,
                 solvable = null,
-                unsolvablePenalty = false
+                unsolvablePenalty = false,
+                mergeDeadEnd = false
             )
             saveGameRecord()
-            startNewGame(current.difficulty, currentIsPractice, carryScore = true)
+            soundManager.play(SoundType.SUCCESS)
         }
     }
 
     private fun saveGameRecord() {
         val current = _state.value
-        if (currentIsPractice) return // Practice mode doesn't count towards stats
+        if (currentIsPractice || currentIsDaily) return
 
         viewModelScope.launch {
             val timeTaken = current.accumulatedTime

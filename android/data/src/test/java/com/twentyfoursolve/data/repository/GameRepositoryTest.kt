@@ -171,7 +171,7 @@ class FakeGameRecordDao : GameRecordDao {
 
     override suspend fun getTopSolves(limit: Int): List<GameRecordEntity> {
         return records
-            .filter { it.isSuccess }
+            .filter { it.isSuccess && it.mode == "timed" }
             .sortedByDescending { it.score }
             .take(limit)
     }

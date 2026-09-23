@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -68,8 +70,22 @@ import com.twentyfoursolve.app.theme.Spacing
 import com.twentyfoursolve.app.ui.components.NumberCard
 import com.twentyfoursolve.app.ui.components.OperatorSymbol
 import com.twentyfoursolve.core.model.Difficulty
+import com.twentyfoursolve.core.model.GameState
 import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.core.model.Suit
+
+/** 成功展示完整算式；只剩一张牌却没到 24 时展示走到的式子。时间到且牌还没并完则不展示。 */
+private fun resultFormula(state: GameState): String? {
+    if (state.wonByUnsolvable) return null
+    val live = state.cards.filter { !it.isUsed }
+    if (live.size != 1) return null
+    val formula = live[0].formula
+    if (formula.isBlank()) return null
+    if (!state.isSuccess && !formula.any { it == '+' || it == '−' || it == '×' || it == '÷' || it == '-' }) {
+        return null
+    }
+    return formula
+}
 
 internal fun hintPenaltyText(strings: Map<String, String>, points: Int, seconds: Int): String? {
     if (points <= 0 && seconds <= 0) return null
@@ -96,6 +112,7 @@ internal fun buildShareText(
 fun GameScreen(
     difficulty: String,
     isPractice: Boolean,
+    isDaily: Boolean = false,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = hiltViewModel()
@@ -109,9 +126,12 @@ fun GameScreen(
     BackHandler { showExitDialog = true }
 
     // Initialize the game when composable enters
-    LaunchedEffect(difficulty, isPractice) {
-        val diff = Difficulty.fromName(difficulty)
-        viewModel.startNewGame(diff, isPractice)
+    LaunchedEffect(difficulty, isPractice, isDaily) {
+        if (isDaily) {
+            viewModel.startDailyGame()
+        } else {
+            viewModel.startNewGame(Difficulty.fromName(difficulty), isPractice)
+        }
     }
 
     Column(
@@ -237,7 +257,9 @@ fun GameScreen(
             isSuccess = state.isSuccess,
             timeTaken = if (isPractice) 0 else (state.timeLimit - state.timeRemaining).coerceAtLeast(0),
             score = state.roundScore,
-            formula = if (state.isSuccess) state.cards.firstOrNull { !it.isUsed }?.formula else null,
+            formula = resultFormula(state),
+            wonByUnsolvable = state.wonByUnsolvable,
+            isDaily = state.isDaily,
             puzzleNumbers = state.initialPuzzle,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
@@ -702,6 +724,8 @@ private fun ResultModal(
     timeTaken: Int,
     score: Int,
     formula: String?,
+    wonByUnsolvable: Boolean,
+    isDaily: Boolean,
     puzzleNumbers: List<Int>,
     onNextRound: () -> Unit,
     onExit: () -> Unit,
@@ -711,13 +735,15 @@ private fun ResultModal(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+            .padding(vertical = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp),
             shape = RoundedCornerShape(CornerRadius.xl),
             color = MaterialTheme.colorScheme.surfaceContainerLowest
         ) {
@@ -764,16 +790,21 @@ private fun ResultModal(
 
                 // Description
                 Text(
-                    text = strings[if (isSuccess) "masteredLevel" else "failedLevel"] ?: "",
+                    text = when {
+                        wonByUnsolvable -> strings["unsolvableWin"] ?: "You spotted that this hand has no solution."
+                        isSuccess -> strings["masteredLevel"] ?: ""
+                        else -> strings["failedLevel"] ?: ""
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 
-                if (isSuccess && !formula.isNullOrBlank()) {
+                if (!wonByUnsolvable && !formula.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
-                        text = strings["yourSolution"] ?: "Your solution",
+                        text = strings[if (isSuccess) "yourSolution" else "yourAttempt"]
+                            ?: if (isSuccess) "Your solution" else "You reached",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.Black,
@@ -823,7 +854,7 @@ private fun ResultModal(
                         .fillMaxWidth()
                         .height(64.dp)
                         .clip(RoundedCornerShape(CornerRadius.full))
-                        .clickable(onClick = onNextRound),
+                        .clickable(onClick = { if (isDaily) onExit() else onNextRound() }),
                     shape = RoundedCornerShape(CornerRadius.full),
                     color = MaterialTheme.colorScheme.primary
                 ) {
@@ -852,7 +883,11 @@ private fun ResultModal(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = strings["nextRound"] ?: "Next Round",
+                                text = if (isDaily) {
+                                    strings["done"] ?: "Done"
+                                } else {
+                                    strings["nextRound"] ?: "Next Round"
+                                },
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontFamily = PlusJakartaSans,
                                     fontWeight = FontWeight.Black
