@@ -22,7 +22,16 @@ interface GameRepository {
     suspend fun getCurrentStreak(): Int
     suspend fun getTopSolves(limit: Int): List<GameRecord>
     suspend fun getDailyActivity(sinceTimestamp: Long): List<DailyActivityResult>
+    /** 计时局按难度汇总。四档都会返回，没有记录的档 games 为 0。 */
+    suspend fun getDifficultyStats(): List<DifficultyStats>
 }
+
+data class DifficultyStats(
+    val difficulty: Difficulty,
+    val games: Int,
+    val wins: Int,
+    val avgTimeSeconds: Double?,
+)
 
 data class DailyActivityResult(
     val date: Long,
@@ -80,6 +89,19 @@ class LocalGameRepository @Inject constructor(
     override suspend fun getDailyActivity(sinceTimestamp: Long): List<DailyActivityResult> {
         return dao.getDailyActivity(sinceTimestamp).map {
             DailyActivityResult(date = it.date, winCount = it.win_count)
+        }
+    }
+
+    override suspend fun getDifficultyStats(): List<DifficultyStats> {
+        val byName = dao.getTimedStatsByDifficulty().associateBy { it.difficulty }
+        return Difficulty.entries.map { difficulty ->
+            val row = byName[difficulty.name.lowercase()]
+            DifficultyStats(
+                difficulty = difficulty,
+                games = row?.games ?: 0,
+                wins = row?.wins ?: 0,
+                avgTimeSeconds = row?.avgTime,
+            )
         }
     }
 

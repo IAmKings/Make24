@@ -48,6 +48,12 @@ class ModelsTest {
         assertEquals(180, Difficulty.EXTREME.timeLimitSeconds)
         assertTrue(Difficulty.EXTREME.alwaysSolvable)
         assertTrue(Difficulty.EASY.alwaysSolvable)
+        assertEquals(0, Difficulty.EASY.hintPointPenalty)
+        assertEquals(150, Difficulty.MEDIUM.hintPointPenalty)
+        assertEquals(0, Difficulty.MEDIUM.hintTimePenaltySeconds)
+        assertEquals(150, Difficulty.HARD.hintPointPenalty)
+        assertEquals(300, Difficulty.EXTREME.hintPointPenalty)
+        assertEquals(15, Difficulty.EXTREME.hintTimePenaltySeconds)
     }
 
 

@@ -51,11 +51,29 @@ interface GameRecordDao {
     """)
     suspend fun getDailyActivity(sinceTimestamp: Long): List<DailyActivity>
 
+    @Query("""
+        SELECT difficulty AS difficulty,
+               COUNT(*) AS games,
+               SUM(CASE WHEN isSuccess = 1 THEN 1 ELSE 0 END) AS wins,
+               AVG(CASE WHEN isSuccess = 1 THEN CAST(timeTaken AS REAL) END) AS avgTime
+        FROM game_records
+        WHERE mode = 'timed'
+        GROUP BY difficulty
+    """)
+    suspend fun getTimedStatsByDifficulty(): List<DifficultyStatRow>
+
     /**
      * Daily activity summary for the activity chart.
      */
     data class DailyActivity(
         val date: Long,
         val win_count: Int
+    )
+
+    data class DifficultyStatRow(
+        val difficulty: String,
+        val games: Int,
+        val wins: Int,
+        val avgTime: Double?,
     )
 }

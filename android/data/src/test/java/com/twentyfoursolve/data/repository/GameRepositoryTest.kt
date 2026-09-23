@@ -106,6 +106,30 @@ class GameRepositoryTest {
     }
 
     @Test
+    fun `difficulty stats count only that tier timed games`() = runTest {
+        repository.saveGameRecord(createRecord(isSuccess = true, timeTaken = 10, difficulty = "easy"))
+        repository.saveGameRecord(createRecord(isSuccess = false, timeTaken = 80, difficulty = "easy"))
+        repository.saveGameRecord(createRecord(isSuccess = true, timeTaken = 40, difficulty = "medium"))
+        repository.saveGameRecord(
+            createRecord(isSuccess = true, timeTaken = 5, difficulty = "medium", mode = "practice")
+        )
+
+        val stats = repository.getDifficultyStats()
+        val easy = stats.first { it.difficulty == com.twentyfoursolve.core.model.Difficulty.EASY }
+        val medium = stats.first { it.difficulty == com.twentyfoursolve.core.model.Difficulty.MEDIUM }
+        val hard = stats.first { it.difficulty == com.twentyfoursolve.core.model.Difficulty.HARD }
+
+        assertEquals(4, stats.size)
+        assertEquals(2, easy.games)
+        assertEquals(1, easy.wins)
+        assertEquals(10.0, easy.avgTimeSeconds)
+        assertEquals(1, medium.games)
+        assertEquals(40.0, medium.avgTimeSeconds)
+        assertEquals(0, hard.games)
+        assertEquals(null, hard.avgTimeSeconds)
+    }
+
+    @Test
     fun `getDailyActivity returns activity data`() = runTest {
         repository.saveGameRecord(createRecord(isSuccess = true))
         repository.saveGameRecord(createRecord(isSuccess = false))
@@ -171,6 +195,21 @@ class FakeGameRecordDao : GameRecordDao {
             }
         }
         return streak
+    }
+
+    override suspend fun getTimedStatsByDifficulty(): List<GameRecordDao.DifficultyStatRow> {
+        return records
+            .filter { it.mode == "timed" }
+            .groupBy { it.difficulty }
+            .map { (difficulty, rows) ->
+                val wins = rows.filter { it.isSuccess }
+                GameRecordDao.DifficultyStatRow(
+                    difficulty = difficulty,
+                    games = rows.size,
+                    wins = wins.size,
+                    avgTime = wins.map { it.timeTaken.toDouble() }.average().takeIf { wins.isNotEmpty() },
+                )
+            }
     }
 
     override suspend fun getDailyActivity(sinceTimestamp: Long): List<GameRecordDao.DailyActivity> {

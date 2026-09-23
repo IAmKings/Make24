@@ -302,6 +302,10 @@ class GameViewModel @Inject constructor(
         // 当关用时（秒），游戏结束时累加到累计用时
         val roundTime = if (isGameOver) (totalGameTime - current.timeRemaining).coerceAtLeast(0) else 0
 
+        val deadEnd = current.difficulty != Difficulty.EASY &&
+            !isGameOver &&
+            !remainingHasSolution(remainingCards)
+
         _state.value = current.copy(
             cards = newCards,
             selectedCardIndices = emptySet(),
@@ -311,7 +315,9 @@ class GameViewModel @Inject constructor(
             roundScore = roundScore,
             accumulatedTime = current.accumulatedTime + roundTime,
             isGameOver = isGameOver,
-            isSuccess = isSuccess
+            isSuccess = isSuccess,
+            mergeRejected = false,
+            mergeDeadEnd = deadEnd
         )
 
         if (isGameOver) {
@@ -351,7 +357,9 @@ class GameViewModel @Inject constructor(
             cards = previousCards,
             history = current.history.dropLast(1),
             selectedCardIndices = emptySet(),
-            currentOperator = null
+            currentOperator = null,
+            mergeDeadEnd = false,
+            mergeRejected = false
         )
     }
 
@@ -394,12 +402,14 @@ class GameViewModel @Inject constructor(
 
     /**
      * 请求提示：按当前剩余牌数分派求解器。
-     * 超难计时局只给出下一步合并，并且每局限扣一次 300 分和 15 秒。
-     * 练习局以及其余难度给出完整解法，不扣分。
+     * 练习局和计时简单给完整解法。计时中等、困难、超难只给下一步，
+     * 并且按难度每局限扣一次分（超难还扣时间）。
      */
     fun requestHint() {
         val current = _state.value
-        val stepHint = current.difficulty == Difficulty.EXTREME && !currentIsPractice
+        val penalty = current.difficulty
+        val stepHint = !currentIsPractice &&
+            (penalty.hintPointPenalty > 0 || penalty.hintTimePenaltySeconds > 0)
         val result = solveCurrentBoard(
             if (stepHint) ExpressionStyle.FULLY_PARENTHESIZED else ExpressionStyle.COMPACT
         )
@@ -411,21 +421,29 @@ class GameViewModel @Inject constructor(
                         _state.value = current.copy(hint = null, hintUnsolvable = false, hintIsStep = false)
                         return
                     }
-                    val charge = !current.extremeHintUsed
+                    val charge = !current.hintCharged
+                    val points = if (charge) penalty.hintPointPenalty else 0
+                    val seconds = if (charge) penalty.hintTimePenaltySeconds else 0
                     _state.value = current.copy(
                         hint = firstSolutionStep(expression),
                         hintIsStep = true,
-                        hintPenaltyApplied = charge,
-                        extremeHintUsed = true,
+                        hintPenaltyPoints = points,
+                        hintPenaltySeconds = seconds,
+                        hintCharged = current.hintCharged || charge,
                         hintUnsolvable = false,
-                        score = if (charge) maxOf(0, current.score - 300) else current.score,
-                        timeRemaining = if (charge) maxOf(1, current.timeRemaining - 15) else current.timeRemaining
+                        score = if (points > 0) maxOf(0, current.score - points) else current.score,
+                        timeRemaining = if (seconds > 0) {
+                            maxOf(1, current.timeRemaining - seconds)
+                        } else {
+                            current.timeRemaining
+                        }
                     )
                 } else {
                     _state.value = current.copy(
                         hint = result.expression,
                         hintIsStep = false,
-                        hintPenaltyApplied = false,
+                        hintPenaltyPoints = 0,
+                        hintPenaltySeconds = 0,
                         hintUnsolvable = false
                     )
                 }
@@ -435,7 +453,8 @@ class GameViewModel @Inject constructor(
                 _state.value = current.copy(
                     hint = null,
                     hintIsStep = false,
-                    hintPenaltyApplied = false,
+                    hintPenaltyPoints = 0,
+                    hintPenaltySeconds = 0,
                     hintUnsolvable = true
                 )
             }
@@ -444,7 +463,8 @@ class GameViewModel @Inject constructor(
                 _state.value = current.copy(
                     hint = null,
                     hintIsStep = false,
-                    hintPenaltyApplied = false,
+                    hintPenaltyPoints = 0,
+                    hintPenaltySeconds = 0,
                     hintUnsolvable = false
                 )
             }
@@ -507,8 +527,29 @@ class GameViewModel @Inject constructor(
             hint = null,
             hintUnsolvable = false,
             hintIsStep = false,
-            hintPenaltyApplied = false
+            hintPenaltyPoints = 0,
+            hintPenaltySeconds = 0
         )
+    }
+
+    fun clearMergeDeadEnd() {
+        _state.value = _state.value.copy(mergeDeadEnd = false)
+    }
+
+    /** 剩余 3 张或 2 张时，判断还能不能凑成 24。其他张数视为不需要提示。 */
+    private fun remainingHasSolution(cards: List<Card>): Boolean {
+        return when (cards.size) {
+            3 -> TwentyFourSolver.solveThree(
+                Rational(cards[0].numerator, cards[0].denominator),
+                Rational(cards[1].numerator, cards[1].denominator),
+                Rational(cards[2].numerator, cards[2].denominator)
+            ).status == SolveStatus.SOLVED
+            2 -> TwentyFourSolver.solveTwo(
+                Rational(cards[0].numerator, cards[0].denominator),
+                Rational(cards[1].numerator, cards[1].denominator)
+            ).status == SolveStatus.SOLVED
+            else -> true
+        }
     }
 
     fun clearSolvable() {

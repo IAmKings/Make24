@@ -232,6 +232,25 @@ fun StatsScreen(
             }
         }
 
+        Text(
+            text = strings["byDifficulty"] ?: "By difficulty",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Black,
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            ),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+        stats.byDifficulty.forEach { row ->
+            DifficultyStatRow(
+                name = difficultyLabel(strings, row.difficulty),
+                winRate = row.winRate?.let { "${(it * 100).toInt()}%" } ?: "—",
+                avgTime = row.avgTimeSeconds?.let { "${it.toInt()}s" } ?: "—",
+                games = (strings["gamesCount"] ?: "%d games").format(row.games),
+            )
+        }
+
         // Activity placeholder (simplified bar chart)
         ActivityChart(
             label = strings["activity"] ?: "Activity",
@@ -264,6 +283,59 @@ fun StatsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun DifficultyStatRow(
+    name: String,
+    winRate: String,
+    avgTime: String,
+    games: String,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(CornerRadius.lg),
+        color = MaterialTheme.colorScheme.surfaceContainerLowest
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = games,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Text(
+                text = "$winRate · $avgTime",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Black
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+private fun difficultyLabel(
+    strings: Map<String, String>,
+    difficulty: com.twentyfoursolve.core.model.Difficulty,
+): String = when (difficulty) {
+    com.twentyfoursolve.core.model.Difficulty.EASY -> strings["easy"] ?: "Easy"
+    com.twentyfoursolve.core.model.Difficulty.MEDIUM -> strings["medium"] ?: "Medium"
+    com.twentyfoursolve.core.model.Difficulty.HARD -> strings["hard"] ?: "Hard"
+    com.twentyfoursolve.core.model.Difficulty.EXTREME -> strings["extreme"] ?: "Extreme"
 }
 
 @Composable

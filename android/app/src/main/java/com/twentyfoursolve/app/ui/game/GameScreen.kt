@@ -71,7 +71,26 @@ import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.core.model.Operator
 import com.twentyfoursolve.core.model.Suit
 
-private const val SHARE_TEXT_TEMPLATE = "24 SOLVE - %s\nScore: %d | Time: %s\nCan you solve it? 🎯"
+internal fun hintPenaltyText(strings: Map<String, String>, points: Int, seconds: Int): String? {
+    if (points <= 0 && seconds <= 0) return null
+    return if (seconds > 0) {
+        (strings["hintStepPenaltyBoth"] ?: "−%1\$d points and −%2\$d seconds.").format(points, seconds)
+    } else {
+        (strings["hintStepPenaltyPoints"] ?: "−%d points.").format(points)
+    }
+}
+
+internal fun buildShareText(
+    numbers: List<Int>,
+    formula: String?,
+    score: Int,
+    timeLabel: String?,
+): String {
+    val cards = numbers.joinToString(" ")
+    val formulaLine = formula?.takeIf { it.isNotBlank() }?.let { "\n$it" }.orEmpty()
+    val scoreLine = if (timeLabel == null) "Score: $score" else "Score: $score | Time: $timeLabel"
+    return "24 SOLVE\n$cards$formulaLine\n$scoreLine"
+}
 
 @Composable
 fun GameScreen(
@@ -219,6 +238,7 @@ fun GameScreen(
             timeTaken = if (isPractice) 0 else (state.timeLimit - state.timeRemaining).coerceAtLeast(0),
             score = state.roundScore,
             formula = if (state.isSuccess) state.cards.firstOrNull { !it.isUsed }?.formula else null,
+            puzzleNumbers = state.initialPuzzle,
             onNextRound = { viewModel.onNextRound() },
             onExit = onExit,
             strings = strings,
@@ -241,10 +261,14 @@ fun GameScreen(
                         },
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                     )
-                    if (state.hintPenaltyApplied) {
+                    val penaltyText = hintPenaltyText(
+                        strings,
+                        state.hintPenaltyPoints,
+                        state.hintPenaltySeconds,
+                    )
+                    if (penaltyText != null) {
                         Text(
-                            strings["hintStepPenalty"]
-                                ?: "−300 points and −15 seconds.",
+                            penaltyText,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -300,6 +324,25 @@ fun GameScreen(
                     // 确实无解 = 正确识别，视为过关胜利（保存成功记录 + 奖励分 + 延续下一关）
                     if (!solvable) viewModel.confirmUnsolvableWin()
                 }) {
+                    Text(strings["gotIt"] ?: "Got It")
+                }
+            }
+        )
+    }
+
+    // 中等及以上：死步已经落下，提示可以撤销
+    if (state.mergeDeadEnd) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearMergeDeadEnd() },
+            title = { Text(strings["mergeDeadEndTitle"] ?: "No path left") },
+            text = {
+                Text(
+                    strings["mergeDeadEnd"]
+                        ?: "No solution after this step. You can undo and try again."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearMergeDeadEnd() }) {
                     Text(strings["gotIt"] ?: "Got It")
                 }
             }
@@ -659,6 +702,7 @@ private fun ResultModal(
     timeTaken: Int,
     score: Int,
     formula: String?,
+    puzzleNumbers: List<Int>,
     onNextRound: () -> Unit,
     onExit: () -> Unit,
     strings: Map<String, String>,
@@ -830,15 +874,12 @@ private fun ResultModal(
                             .height(56.dp)
                             .clip(RoundedCornerShape(CornerRadius.full))
                             .clickable {
-                                val shareText = if (isPractice) {
-                                    "24 SOLVE - Practice Mode\nScore: $score\nI mastered 24! Can you? 🎯"
-                                } else {
-                                    SHARE_TEXT_TEMPLATE.format(
-                                        "Challenge",
-                                        score,
-                                        formatTime(timeTaken)
-                                    )
-                                }
+                                val shareText = buildShareText(
+                                    numbers = puzzleNumbers,
+                                    formula = formula,
+                                    score = score,
+                                    timeLabel = if (isPractice) null else formatTime(timeTaken),
+                                )
                                 val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                                     type = "text/plain"
                                     putExtra(android.content.Intent.EXTRA_TEXT, shareText)

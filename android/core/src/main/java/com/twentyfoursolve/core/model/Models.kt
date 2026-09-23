@@ -60,11 +60,23 @@ enum class Difficulty(
     val timeLimitSeconds: Int = 120,
     /** 简单与超难始终发有解牌，不受「允许无解题」开关影响。 */
     val alwaysSolvable: Boolean = false,
+    /** 计时局第一次分步提示扣除的分数。0 表示给出完整算式且不扣分。 */
+    val hintPointPenalty: Int = 0,
+    /** 计时局第一次分步提示扣除的秒数。 */
+    val hintTimePenaltySeconds: Int = 0,
 ) {
     EASY(1..6, "Easy", 1.0, alwaysSolvable = true),
-    MEDIUM(1..10, "Medium", 1.5),
-    HARD(1..13, "Hard", 2.0),
-    EXTREME(1..13, "Extreme", 3.0, timeLimitSeconds = 180, alwaysSolvable = true);
+    MEDIUM(1..10, "Medium", 1.5, hintPointPenalty = 150),
+    HARD(1..13, "Hard", 2.0, hintPointPenalty = 150),
+    EXTREME(
+        1..13,
+        "Extreme",
+        3.0,
+        timeLimitSeconds = 180,
+        alwaysSolvable = true,
+        hintPointPenalty = 300,
+        hintTimePenaltySeconds = 15,
+    );
 
     companion object {
         fun fromName(name: String): Difficulty = when (name.lowercase()) {
@@ -103,18 +115,22 @@ data class GameState(
     val isGameOver: Boolean = false,
     val isSuccess: Boolean = false,
     val history: List<List<Card>> = emptyList(),
-    /** 提示：当前牌面的一个解法表达式，或超难计时局的第一步（null 表示未请求提示）。 */
+    /** 提示：完整解法，或计时中等及以上的下一步（null 表示未请求提示）。 */
     val hint: String? = null,
-    /** 超难计时局的提示只含一步合并，而不是整式。 */
+    /** 这次提示只含一步合并，而不是整式。 */
     val hintIsStep: Boolean = false,
-    /** 这次提示刚刚扣除了 300 分和 15 秒。 */
-    val hintPenaltyApplied: Boolean = false,
-    /** 本局超难提示已经扣过一次，再次打开不再扣。 */
-    val extremeHintUsed: Boolean = false,
+    /** 这次提示刚刚扣除的分数。0 表示本次没扣。 */
+    val hintPenaltyPoints: Int = 0,
+    /** 这次提示刚刚扣除的秒数。0 表示本次没扣时间。 */
+    val hintPenaltySeconds: Int = 0,
+    /** 本局分步提示已经扣过一次，再次打开不再扣。 */
+    val hintCharged: Boolean = false,
     /** 可解性检查结果：null=未检查，true=有解，false=无解。 */
     val solvable: Boolean? = null,
     /** 简单难度下合并被拒绝（合并后剩余牌面无解）。 */
     val mergeRejected: Boolean = false,
+    /** 中等及以上：这一步已经落下，但剩余牌面无解。 */
+    val mergeDeadEnd: Boolean = false,
     /** 是否允许无解题（设置配置；决定无解按钮可用性）。 */
     val allowUnsolvable: Boolean = true,
     /** 提示结果为无解（当前牌面无法到 24，作为回答展示）。 */

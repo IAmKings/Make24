@@ -2,6 +2,7 @@ package com.twentyfoursolve.app.ui.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twentyfoursolve.core.model.Difficulty
 import com.twentyfoursolve.data.repository.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +17,15 @@ data class StatsUiModel(
     val avgTime: Double = 0.0,
     val currentStreak: Int = 0,
     val topSolves: List<TopSolve> = emptyList(),
-    val dailyWins: List<DailyWin> = emptyList()
+    val dailyWins: List<DailyWin> = emptyList(),
+    val byDifficulty: List<DifficultyStat> = emptyList(),
 ) {
+    data class DifficultyStat(
+        val difficulty: Difficulty,
+        val games: Int,
+        val winRate: Float?,
+        val avgTimeSeconds: Double?,
+    )
     data class TopSolve(
         val rank: Int,
         val score: Int,
@@ -57,6 +65,7 @@ class StatsViewModel @Inject constructor(
                 val avgTime = gameRepository.getAverageTime() ?: 0.0
                 val streak = gameRepository.getCurrentStreak()
                 val topSolves = gameRepository.getTopSolves(3)
+                val byDifficulty = gameRepository.getDifficultyStats()
 
                 val sevenDaysAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000L
                 val dailyActivity = gameRepository.getDailyActivity(sevenDaysAgo)
@@ -79,7 +88,15 @@ class StatsViewModel @Inject constructor(
                         StatsUiModel.DailyWin(dayIndex = idx, wins = day.winCount)
                     }.takeIf { it.isNotEmpty() } ?: (0..6).map {
                         StatsUiModel.DailyWin(dayIndex = it, wins = 0)
-                    }
+                    },
+                    byDifficulty = byDifficulty.map { row ->
+                        StatsUiModel.DifficultyStat(
+                            difficulty = row.difficulty,
+                            games = row.games,
+                            winRate = if (row.games == 0) null else row.wins.toFloat() / row.games,
+                            avgTimeSeconds = row.avgTimeSeconds,
+                        )
+                    },
                 )
             } catch (_: Exception) {
                 // Keep default empty state
