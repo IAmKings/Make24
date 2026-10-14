@@ -32,7 +32,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp website/index.html _site/
+          cp -r website/. _site/
           cp -r screen _site/screen
           cp 24point-adaptive-icon.svg 24point-Congratulations.svg 24point-failure-icon.svg _site/
           rm -f _site/screen/.DS_Store

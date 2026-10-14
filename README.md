@@ -4,7 +4,7 @@
 
 一个基于 **Jetpack Compose** 的 24 点数学游戏 Android 应用，配套一套**跨平台（Kotlin Multiplatform）24 点精确求解算法**。通过 `+ - × ÷` 与任意括号把 4 张牌凑成 24，支持三档难度、无解题配置、实时提示/无解判定与丰富的计分机制。
 
-> 求解算法（纯 Kotlin，可嵌入任意 Compose Multiplatform 项目）见 [`solver/README.md`](solver/README.md)。
+> 求解算法（纯 Kotlin，可嵌入任意 Compose Multiplatform 项目）见 [`solver/README.md`](solver/README.md)，在线图解版：<https://iamkings.github.io/Make24/solver.html>
 
 ## 运行截图
 
