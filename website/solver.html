@@ -433,6 +433,7 @@ section{padding:92px 0}
 .lut-cell.ok{background:var(--lut-ok)}
 .lut-cell.bad{background:var(--lut-bad)}
 .lut-cell.active{background:var(--gold);animation:cellpulse .5s ease infinite alternate}
+.lut-cell.sel,.lut-cell.sel:hover{outline:3px solid var(--gold);outline-offset:1px;transform:scale(1.25);position:relative;z-index:3}
 @keyframes cellpulse{to{filter:brightness(1.25)}}
 .lut-detail{
   margin-top:18px;background:var(--surface-low);border:1px solid var(--ghost);
@@ -867,7 +868,7 @@ negative: <span class="tok-k">false</span>            <span class="tok-c">// 0 �
           <div class="lut-grid" id="lut-grid" role="grid" aria-label="1820 组合求解网格"></div>
         </div>
         <div class="lut-detail" id="lut-detail">
-          <div class="d-hint">点击任意格子，查看该牌组的求解结果。绿色 = 可解（显示一条精确解法），红色 = 无解。</div>
+          <div class="d-hint">点击任意格子，对应格子会以金色描边高亮。绿色 = 可解（显示一条精确解法），红色 = 无解。</div>
         </div>
         <div class="lut-done" id="lut-banner"></div>
       </div>
@@ -1156,10 +1157,11 @@ var COMBOS=[];
 (function(){
   for(var a=1;a<=13;a++)for(var b=a;b<=13;b++)for(var c=b;c<=13;c++)for(var d=c;d<=13;d++)COMBOS.push([a,b,c,d]);
 })();
-var lutResults=new Array(COMBOS.length), lutDone=0, lutOk=0, lutBad=0, lutRunning=false, lutT0=0, lutAutoStarted=false, lutCells=null, lutLastActive=-1;
+var lutResults=new Array(COMBOS.length), lutDone=0, lutOk=0, lutBad=0, lutRunning=false, lutT0=0, lutAutoStarted=false, lutCells=null, lutLastActive=-1, lutSelectedIdx=-1;
 function lutReset(){
   lutRunning=false;
   lutLastActive=-1;
+  lutSelectedIdx=-1;
   lutResults=new Array(COMBOS.length); lutDone=0; lutOk=0; lutBad=0;
   var grid=$('lut-grid');
   if(!lutCells){
@@ -1184,7 +1186,7 @@ function lutReset(){
   $('lut-bad-n').textContent='0';
   $('lut-time').textContent='—';
   $('lut-banner').className='lut-done';
-  $('lut-detail').innerHTML='<div class="d-hint">点击任意格子，查看该牌组的求解结果。绿色 = 可解（显示一条精确解法），红色 = 无解。</div>';
+  $('lut-detail').innerHTML='<div class="d-hint">点击任意格子，对应格子会以金色描边高亮。绿色 = 可解（显示一条精确解法），红色 = 无解。</div>';
   $('lut-start').disabled=false;
   $('lut-start').textContent='开始构建';
 }
@@ -1220,6 +1222,12 @@ function lutStep(){
   showDetail(1809);
 }
 function showDetail(idx){
+  if(lutSelectedIdx>=0 && lutCells[lutSelectedIdx]) lutCells[lutSelectedIdx].classList.remove('sel');
+  lutSelectedIdx=idx;
+  if(lutCells[idx]){
+    lutCells[idx].classList.add('sel');
+    if(lutCells[idx].scrollIntoView) lutCells[idx].scrollIntoView({block:'nearest'});
+  }
   var d=$('lut-detail'), combo=COMBOS[idx], r=lutResults[idx];
   if(r===undefined){
     d.innerHTML='<div class="d-cards">'+combo.join(' · ')+'</div>'
