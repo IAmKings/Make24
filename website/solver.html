@@ -655,8 +655,8 @@ result.usedLut     <span class="tok-c">// →</span> <span class="tok-ok">true</
         </div>
         <div class="dfs-side">
           <div class="side-card">
-            <h3>每对组合，固定 6 个候选</h3>
-            <p>候选按 <b>+ a−b b−a × a÷b b÷a</b> 的固定顺序生成，值相同的候选就地去重（如 <b class="mono">2+2</b> 与 <b class="mono">2×2</b> 只保留前者）。固定顺序带来一个工程上奢侈的性质：<b>完全确定性</b> —— 相同输入永远得到逐字节相同的输出。</p>
+            <h3>每对组合，固定 6 个候选——为什么不是 8 个？</h3>
+            <p>四种运算在有序对 (a,b) 上看似应有 <b>8 个</b>方向，但 <b class="mono">b+a</b> 与 <b class="mono">a+b</b>、<b class="mono">b×a</b> 与 <b class="mono">a×b</b> 由交换律保证数值恒等，源码在生成阶段就不会重复产生（对应 op 编码 <b>0–5</b>）；减法与除法不满足交换律，才双向各留一个。生成后值相同的候选仍会就地去重——如 <b class="mono">2+2</b> 与 <b class="mono">2×2</b> 同为 4，只保留 op0。固定顺序带来一个工程上奢侈的性质：<b>完全确定性</b> —— 相同输入永远得到逐字节相同的输出。</p>
           </div>
           <div class="side-card">
             <h3>搜索空间有多大？</h3>
